@@ -1,0 +1,125 @@
+<?php
+// DATA Formate
+//http://localhost/ac_monitoring/controller/devlogs.php/?data=3;01675702741;22;22,1,45,10,8,0,0,128,92,124,151,125,96,163;118,49,0,160,5,166,66,3,35;1,0,72,0,0,1,0,110,0;104,20,11,6,100,1,45,10,8,0,0,128,92,124,151;118,49,0,160,5,166,66,11,6,100,1,45,10,8,0,0,128
+
+// PRAM Packet Explanation
+// Device ID   		= $pram[0]
+// Mobile No   		= $pram[1]
+// Signal Level 	= $pram[2]
+
+// Seial Data Structure
+// Packet No One   	= $pram[3]
+// Packet No Two   	= $pram[4]
+
+// EE DATA
+// IDU EE Data   	= $pram[3]
+// ODU EE Data   	= $pram[4]
+
+$rcvData = $_GET['data'];
+$pram = explode(";", $rcvData);
+echo "<pre>";print_r($pram);echo "</pre>";
+$DBMatchtID = "";
+
+// DB Setup
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "ee_monitoring";
+
+
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+	die("Connection failed: " . $conn->connect_error);
+}
+
+// Creat LOG
+$sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES (NULL, ".$pram[1].", '".$rcvData."', current_timestamp(), current_timestamp());";
+	$conn->query($sql);
+// Check Availiability
+	$sql = "SELECT * FROM `dev_last_sts` WHERE `dev_id`='".$pram[0]."';";
+	$result = $conn->query($sql);
+
+	if ($result->num_rows > 0) {
+	// IF FOUND
+		while($row = $result->fetch_assoc()) {
+			$DBMatchtID =  $row["id"];
+		}
+		// UPDATE Device Last status Table
+		$sql = "UPDATE `dev_last_sts` SET `mob_no`='".$pram[1]."',`signal_Lvl`='".$pram[2]."',`serial_pac_one`='".$pram[3]."',`serial_pac_two`='".$pram[4]."',`idu_ee`='".$pram[5]."',`odu_ee`='".$pram[6]."',`modified`=current_timestamp() WHERE `id`='".$DBMatchtID."'; ";
+		$conn->query($sql);
+		// UPDATE Device Last status Table
+		$sql = "UPDATE `live_device` SET `mob_no`='".$pram[1]."',`status`='1',`modified`=current_timestamp() WHERE `device_Id` = '".$pram[0]."';";
+		$conn->query($sql);
+		
+
+	} else {
+	// IF NOT FOUND
+		// Creat New Row in Device Last status Table
+		$sql = "INSERT INTO `dev_last_sts` (`id`, `dev_id`, `mob_no`, `signal_Lvl`, `serial_pac_one`, `serial_pac_two`, `idu_ee`, `odu_ee`, `created`, `modified`) VALUES (NULL, '".$pram[0]."','".$pram[1]."','".$pram[2]."','".$pram[3]."','".$pram[4]."','".$pram[5]."','".$pram[6]."', current_timestamp(), current_timestamp());";
+			$conn->query($sql);
+		// Creat New Row in Live status Table of device
+			$sql = "INSERT INTO `live_device` (`id`, `device_Id`, `mob_no`, `status`, `created`, `modified`) VALUES (NULL, ".$pram[0].", ".$pram[1].", '1', current_timestamp(), current_timestamp());";
+			$conn->query($sql);
+			echo $sql;
+		}
+		$conn->close();
+
+
+
+		?>
+
+
+
+
+<!-- 
+
+// Create connection
+// $conn = new mysqli($servername, $username, $password, $dbname);
+// // Check connection
+// if ($conn->connect_error) {
+// 	die("Connection failed: " . $conn->connect_error);
+// }
+
+// $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES (NULL, NULL, '".$rcvData."', current_timestamp(), current_timestamp());";
+
+// 	if ($conn->query($sql) === TRUE) {
+// 	//echo "New record created successfully";
+// 	} else {
+// 	//echo "Error: " . $sql . "<br>" . $conn->error;
+// 	}
+// 	$conn->close();
+
+
+
+// 
+// //echo $sql;
+// if ($conn->query($sql) === TRUE) { 
+
+// } else {
+
+// }
+
+
+
+//$conn->close();
+
+// $myfile = fopen("./uploads/01675702741-D.txt", "r") or die("Unable to open file!");
+// echo fread($myfile,filesize("./uploads/01675702741-D.txt"));
+// //fwrite($myfile, $data);
+// fclose($myfile);
+//print_r(file_get_contents("./uploads/01675702741.txt"));
+
+// $file = fopen("./uploads/01675702741.txt", "r");
+
+// //Output lines until EOF is reached
+// while(! feof($file)) {
+//   $line = fgets($file);
+//   echo $line. "<br>";
+// }
+
+// fclose($file);
+
+ -->
