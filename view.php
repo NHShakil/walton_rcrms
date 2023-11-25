@@ -14,6 +14,8 @@
 </head>
 <body>
   <?php
+
+  $mobileNo = $_GET ['mobNo'];
   $servername = "localhost";
   $username = "root";
   $password = "";
@@ -148,7 +150,7 @@
                 <div class="card-body">
                   <div class="row"><img src="./assets/images/faces/serial.png" alt="" width="100%" height="50%">
                   </div>
-                  <a class="nav-link" href="serial.php">
+                  <a class="nav-link" href="serial.php?mobNo=<?php echo $mobileNo;?>">
                     <h3 class="mb-0" align="center">Serial Monitoring</h3>
                   </a>
                 </div>

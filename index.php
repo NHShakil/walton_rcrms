@@ -4,7 +4,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Corona Admin</title>
+  <title>Air Conditoner (RAC)</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="./assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="./assets/vendors/css/vendor.bundle.base.css">
@@ -39,7 +39,6 @@
 
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
       array_push( $devList,$row);
     }
   } else {
@@ -59,7 +58,6 @@
 
   if ($conectDevList->num_rows > 0) {
     while($row = $conectDevList->fetch_assoc()) {
-
       array_push( $navDevList,$row);
     }
   } else {
@@ -92,21 +90,32 @@
           <span class="nav-link">Navigation</span>
         </li>
 
+        <div id="liveDevice">
 
-        <?php
-        foreach ($navDevList as $key => $value) {
-          echo "<li class=\"nav-item menu-items\">
-          <a class=\"nav-link\" href=\"view.php\">
-          <span class=\"menu-icon\">
-          <i class=\"mdi mdi mdi-laptop\"></i>
+          <?php
+          foreach ($navDevList as $key => $value) {
+            echo "<li id = \"".$value['mob_no']."\" class=\"nav-item menu-items\">
+            <a class=\"nav-link\" href=\"view.php?mobNo=".$value['mob_no']."\" aria-expanded=\"false\" aria-controls=\"ui-basic\">
+            <span class=\"menu-icon\">
+            <i class=\"mdi mdi mdi-laptop\"></i>
+            </span>
+            <span class=\"menu-title\">".$value['mob_no']."</span>
+            </a>
+            </li>";
+          }
+          ?>   
+          <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+          
+          
           </span>
-          <span class=\"menu-title\">".$value['mob_no']."</span>
+                         
           </a>
-          </li>";
-        }
-        ?>            
+          
+        </div>         
       </ul>
     </nav>
+ 
+<a href = "javascript:;" onclick = "this.href='Page2.htm?name=' + document.getElementById('txtName').value">Send</a>
 
   </div>
 
@@ -134,10 +143,30 @@
      data: { }
    })
     .done( function (responseText) {
-      // Triggered if response status code is 200 (OK)
-      //$('#message').html('Your message is: ' + responseText);
+      
+      //console.log(responseText);
+      var devDataPac = responseText.split(";");
+      var inActiv = devDataPac[0].split(",");
+      var activ = devDataPac[1].split(",");
+      for (var i = 0; i < inActiv.length; i++) {
+        console.log("INACTIVE:"+inActiv[i]);
+        //$("#"+inActiv[i]+"\'").remove();
+        $('#'+inActiv[i]).remove();
+      }
+      // Adding new Device section
 
-      console.log(responseText);
+      /* This function is not working. The Nth element is required to add new device.*/
+      // for (var i = 0; i < activ.length; i++) {
+      //   console.log("ACTIVE:"+activ[i]);
+      //   $("#liveDevice1 :nth-last-child(3)").append("<li id=\"liveDevice1\" class=\"nav-item menu-items\">"+
+      //     "<a class=\"nav-link\" href=\"view.php\">"+
+      //     "<span class=\"menu-icon\">"+
+      //     "<i class=\"mdi mdi mdi-laptop\"></i>"+
+      //     "</span>"+
+      //     "<span class=\"menu-title\">"+activ[i]+"</span>"+
+      //     "</a>"+
+      //     "</li>");
+      // }
     })
     .fail( function (jqXHR, status, error) {
             // Triggered if response status code is NOT 200 (OK)

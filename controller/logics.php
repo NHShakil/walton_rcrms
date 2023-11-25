@@ -226,14 +226,18 @@ function Limit_Freq($DataVal,$Color)
 
 ?>
 
-<!-- POST
-http://192.168.118.138/adm/repo1/mod/tms/index.php?
-
-1
-
-task_status=1&task_title=test1&task_details=%3Cp%3Etest+2%3C%2Fp%3E%0D%0A&assign_date=2023-09-19+05%3A23%3A00+&dead_line_date=2023-09-30+17%3A23%3A00+&total_days=11+Days+12+Hours+0+Minutes&tpoint=0&tpoint2=0&emp_id=46416&supervisor=46416&supervisor_mobile=01608984877&assign_employee=46416&task_category=44&product_id=1&task_mode=0&tweight=100&priority=STANDARD&any_note=&others_notify_contact=&others_contact_person=&onbehalf=&task_type=1&reason=&btn_insert=Create
 
 
 
-http://192.168.118.138/adm/repo1/mod/tms/index.php?task_status=1&task_title=1&task_details=%3Cp%3E1%3C%2Fp%3E%0D%0A&assign_date=2023-09-20+05%3A28%3A00+&dead_line_date=2023-09-22+17%3A28%3A00+&total_days=2+Days+12+Hours+0+Minutes&tpoint=0&tpoint2=0&emp_id=46416&supervisor=46416&supervisor_mobile=01608984877&assign_employee=46416&task_category=44&product_id=1&task_mode=0&tweight=100&priority=STANDARD&any_note=&others_notify_contact=&others_contact_person=&onbehalf=&task_type=1&reason=&btn_insert=Create
- -->
+
+<?php 
+
+
+
+
+
+
+?>
+
+
+

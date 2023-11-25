@@ -20,19 +20,12 @@
 </head>
 <body>
   <?php
-
   include "./controller/logics.php";
-  $Byte_2= array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
-    //$Byte_6 = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
-  $Byte_18 = array("Compressor on","Oil return open","Outdoor fan on","Fluoro received","Fourway valve open","Defrost on", "Test mode on","Electric heating on");
-  $Byte_19 = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
-  $Alarm_clr = array("outline-secondary","danger","success","primary");
-
+  $mobileNo = $_GET ['mobNo'];
   $servername = "localhost";
   $username = "root";
   $password = "";
   $dbname = "ee_monitoring";
-
 
   $devList = array();
   $conn = new mysqli($servername, $username, $password, $dbname);
@@ -41,19 +34,138 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  $sql = "SELECT * FROM `log` ORDER BY `id` DESC LIMIT 1;";
+  $sql = "SELECT * FROM `dev_last_sts` WHERE `mob_no`='".$mobileNo."'; ";
   $result = $conn->query($sql);
-
+//170,16,1,71,13,13,4,4,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232,
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
-      array_push( $devList,$row);
+      $Packet_One = $row['serial_pac_one'];
+      $Packet_Two = $row['serial_pac_two'];
     }
   } else {
     echo "0 results";
   }
   $conn->close();
 
+
+  $Packet_One = rtrim($Packet_One, ",");
+  $segmntedPacOne = explode(",", $Packet_One);
+
+  echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
+
+
+  $Alarm_clr = array("outline-secondary","danger","success","primary");
+
+  // Byte_2 Description
+  // Operating Mode generated from 
+  $Byte_2     = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
+  $Mode = $Byte_2[$segmntedPacOne[2]];
+
+
+
+
+  // Byte_06 Description
+
+
+
+
+
+
+
+  // Byte_18 Description
+  $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
+  $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+
+  // Byte_19 Description
+  // Indoor FAN Wind Speed Level
+  $Byte_19 = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
+  $IDU_Fan_Speed = $Byte_19[$segmntedPacOne[19]];
+
+  
+  // Byte_09 Description
+  $Ts = ($segmntedPacOne[9]-60)/2;
+  // Byte_10 Description
+  $Tr = ($segmntedPacOne[10]-60)/2;
+  // Byte_13 Description
+  $Te = ($segmntedPacOne[13]-60)/2;
+  // Byte_33 Description
+  $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
+
+
+
+  // Byte_06 Description
+  if ($segmntedPacOne[6] = 0) {
+    $protection = array("");
+    array_push($protection,$Alarm_clr[1],"--");
+  }
+  $Fault      = MajorAlarmDetection($segmntedPacOne[6],$Alarm_clr);
+
+
+  // Byte_07 Description
+  $Protect    = Protection($guiData[7],$Alarm_clr);
+  // Byte_07 Description
+  $Limit      = Limit_Freq($guiData[8],$Alarm_clr);
+
+
+
+
+  $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
+  $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+
+
+
+
+
+
+  
+  
+
+  //echo "<pre>";print_r($Compressor);echo "</pre>";
+
+// ------------------
+  // Frequency Display Section Data
+
+
+
+  //echo "<pre>";print_r($Mode);echo "</pre>";
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    //$Byte_6 = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
+  // $Byte_18 = array("Compressor on","Oil return open","Outdoor fan on","Fluoro received","Fourway valve open","Defrost on", "Test mode on","Electric heating on");
+  
+  
+
+  
+
+
+
+  //OLD
   $navDevList = array();
   $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -74,26 +186,15 @@
   }
   $conn->close();
 
-//print_r($navDevList);
+  //print_r();
 
-  $guiData = "";
-  $guiData  = explode(",",$devList[0]["data"] );
-  $Alarms   =  str_split(decbin($guiData[18]),1);
+  
 
-    // Indicator Section
-  $Compressor = ($Alarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $RetnOil    = ($Alarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $OutFan     = ($Alarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $FourWay    = ($Alarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $DeFrst     = ($Alarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $TestMod    = ($Alarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $PreHeat    = ($Alarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+
     //$Eco        = ($guiData[27]==8) ? $Alarm_clr[2] : $Alarm_clr[0] ;
 
 
-  $Fault      = MajorAlarmDetection($guiData[6],$Alarm_clr);
-  $Protect    = Protection($guiData[7],$Alarm_clr);
-  $Limit      = Limit_Freq($guiData[8],$Alarm_clr);
+  
     //$Down       = Down_Freq($guiData[8],$Alarm_clr);
 
 
@@ -193,7 +294,7 @@
                   <span class="mdi mdi-menu"></span>
                 </button>                
                 <ul class="navbar-nav navbar-nav-right">
-                  
+
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
                   <span class="mdi mdi-format-line-spacing"></span>
@@ -297,12 +398,13 @@
                               </tr>
                               <tr>
                                 <td>Protect</td>
-                                <td><button type="button" class="btn btn-<?php echo $Protect[0];?> btn-rounded btn-icon">
+                                <td><button type="button" class="btn btn-<?php echo $protection[0];?> btn-rounded btn-icon">
                                 </button></td>
-                                <td><?php 
+                                <!-- <td><?php 
                                 for ($i=1; $i < count($Protect) ; $i++) { 
                                   echo $Protect[$i]."</br>";                        }
-                                ?></td>
+                                ?></td> -->
+                                <td><?php echo $protection[1]; ?></td>
                               </tr>
                               <tr>
                                 <td>Limit Freq</td>
@@ -404,7 +506,7 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h1 class="display-5">Mode: <?php echo $Byte_2[$guiData[2]];?></h1>
+                  <h1 class="display-5">Mode: <?php echo $Mode;?></h1>
                   <h1 class="display-5">Rated Mode: <?php echo "----";?></h1>
                 </div>
               </div>
@@ -412,15 +514,15 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h1 class="display-5">Tr: <?php echo (($guiData[10]-60)/2)."°C";?></h1>
-                  <h1 class="display-5">Ts: <?php echo (($guiData[9]-60)/2)."°C";?></h1>
+                  <h1 class="display-5">Tr: <?php echo $Tr."°C";?></h1>
+                  <h1 class="display-5">Ts: <?php echo $Ts."°C";?></h1>
                 </div>
               </div>
             </div>
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h1 class="display-5">Te: <?php echo (($guiData[13]-60)/2)."°C";?></h1>
+                  <h1 class="display-5">Te: <?php echo $Te."°C";?></h1>
                   <h1 class="display-5">Customer : <?php echo "------";?></h1>
                 </div>
               </div>
@@ -428,8 +530,8 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h1 class="display-5">Fan Level: <?php echo ($Byte_19[$guiData[19]]);?></h1>
-                  <h1 class="display-5">Fan rpm: <?php echo (($guiData[33]*10)."rpm");?></h1>
+                  <h1 class="display-5">Fan Level: <?php echo $IDU_Fan_Speed;?></h1>
+                  <h1 class="display-5">Fan rpm: <?php echo $IDU_Fan_Speed_RPM."rpm";?></h1>
                 </div>
               </div>
             </div>
