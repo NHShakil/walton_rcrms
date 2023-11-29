@@ -115,11 +115,10 @@
       </ul>
     </nav>
  
-<a href = "javascript:;" onclick = "this.href='Page2.htm?name=' + document.getElementById('txtName').value">Send</a>
+
 
   </div>
 
-  <!-- partial:./partials/_footer.html -->
   <footer class="footer">
     <div class="d-sm-flex justify-content-center justify-content-sm-between">
       <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>

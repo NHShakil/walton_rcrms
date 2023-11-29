@@ -161,7 +161,7 @@
                 <div class="card-body">
                   <div class="row"><img src="./assets/images/faces/idu.png" alt="" width="100%" height="50%">
                   </div>
-                  <a class="nav-link" href="iduEE.php">
+                  <a class="nav-link" href="iduEE.php?mobNo=<?php echo $mobileNo;?>">
                     <h3 class="mb-0" align="center">IDU EE Program</h3>
                   </a>              
                 </div>

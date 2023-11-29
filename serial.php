@@ -4,6 +4,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="refresh" content="5">
   <title>Corona Admin</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="./assets/vendors/mdi/css/materialdesignicons.min.css">
@@ -27,6 +28,7 @@
   $password = "";
   $dbname = "ee_monitoring";
 
+  $navDevList = array();
   $devList = array();
   $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -34,16 +36,31 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
+  $sql = "SELECT * FROM `live_device` WHERE `status`='1';";
+  $conectDevList = $conn->query($sql);
+
+  if ($conectDevList->num_rows > 0) {
+    while($row = $conectDevList->fetch_assoc()) {
+
+      array_push( $navDevList,$row);
+    }
+  } else {
+    echo "0 results";
+  }
+  
+
   $sql = "SELECT * FROM `dev_last_sts` WHERE `mob_no`='".$mobileNo."'; ";
   $result = $conn->query($sql);
-//170,16,1,71,13,13,4,4,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232,
+//170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232,
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
       $Packet_One = $row['serial_pac_one'];
       $Packet_Two = $row['serial_pac_two'];
+      $Log_Time   = $row['modified'];
     }
+    //echo $Log_Time;
   } else {
-    echo "0 results";
+    
   }
   $conn->close();
 
@@ -51,7 +68,7 @@
   $Packet_One = rtrim($Packet_One, ",");
   $segmntedPacOne = explode(",", $Packet_One);
 
-  echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
+  //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
 
 
   $Alarm_clr = array("outline-secondary","danger","success","primary");
@@ -64,11 +81,11 @@
 
 
 
-  // Byte_06 Description
-
-
-
-
+  // Byte Description
+  $AC_Volt = $segmntedPacOne[15]*2;
+  $AC_Curnt = $segmntedPacOne[16]/10;
+  $DC_Volt = $segmntedPacOne[20]*2;
+  $DC_Curnt = $segmntedPacOne[21]/10;
 
 
 
@@ -105,31 +122,12 @@
     array_push($protection,$Alarm_clr[1],"--");
   }
   $Fault      = MajorAlarmDetection($segmntedPacOne[6],$Alarm_clr);
-
-
   // Byte_07 Description
-  $Protect    = Protection($guiData[7],$Alarm_clr);
+  $Protect    = Protection($segmntedPacOne[7],$Alarm_clr);
   // Byte_07 Description
-  $Limit      = Limit_Freq($guiData[8],$Alarm_clr);
+  $Limit      = Limit_Freq($segmntedPacOne[8],$Alarm_clr);
 
 
-
-
-  $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
-  $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-
-
-
-
-
-
-  
   
 
   //echo "<pre>";print_r($Compressor);echo "</pre>";
@@ -166,29 +164,8 @@
 
 
   //OLD
-  $navDevList = array();
-  $conn = new mysqli($servername, $username, $password, $dbname);
 
-  if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
 
-  $sql = "SELECT * FROM `live_device` WHERE `status`='1';";
-  $conectDevList = $conn->query($sql);
-
-  if ($conectDevList->num_rows > 0) {
-    while($row = $conectDevList->fetch_assoc()) {
-
-      array_push( $navDevList,$row);
-    }
-  } else {
-    echo "0 results";
-  }
-  $conn->close();
-
-  //print_r();
-
-  
 
 
     //$Eco        = ($guiData[27]==8) ? $Alarm_clr[2] : $Alarm_clr[0] ;
@@ -310,10 +287,10 @@
                       <div class="row align-items-center">
 
                         <div class="col-5 col-sm-7 col-xl-8 p-0">
-                          <h4 class="mb-1 mb-sm-0">Version : <?php echo ($guiData[23]);?></h4> 
-                          <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ("20".$guiData[34]."-".$guiData[35]."-".$guiData[36]); ?></h4>
-                          <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$guiData[23]) ?></h4>
-                          <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($devList[0]["created"]) ?></h4>
+                          <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
+                          <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ("20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36]); ?></h4>
+                          <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
+                          <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
                         </div>
                       </div>
                     </div>
@@ -332,7 +309,7 @@
                               <div class="row">
                                 <div class="col-9">
                                   <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><?php echo ("F".$guiData[4]);?></h3>
+                                    <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[4]);?></h3>
                                     <p class="text-success ml-2 mb-0 font-weight-medium"></p>
                                   </div>
                                 </div>                          
@@ -348,7 +325,7 @@
                               <div class="row">
                                 <div class="col-9">
                                   <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><?php echo ("F".$guiData[5]);?></h3>
+                                    <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[5]);?></h3>
                                     <p class="text-success ml-2 mb-0 font-weight-medium"></p>
                                   </div>
                                 </div>                          
@@ -364,12 +341,12 @@
                               <div class="row">
                                 <div class="col-9">
                                   <div class="d-flex align-items-left align-self-start">
-                                    <h3 class="mb-0"><?php echo ($guiData[3]);?></h3>
+                                    <h3 class="mb-0"><?php echo ($segmntedPacOne[3]);?></h3>
                                     <p class="text-danger ml-2 mb-0 font-weight-medium">Hz</p>
                                   </div>
 
                                   <div class="d-flex align-items-left align-self-start">
-                                    <h3 class="mb-0"><?php echo (" ".$guiData[3]*60);?></h3>
+                                    <h3 class="mb-0"><?php echo (" ".$segmntedPacOne[3]*60);?></h3>
                                     <p class="text-danger ml-2 mb-0 font-weight-medium">rpm</p>
                                   </div>
                                 </div>                          
@@ -567,10 +544,10 @@
               <div class="card-body">
                 <div class="template-demo">
                   <h3 class="display-5">Tsu: <?php echo "----";?></h3>
-                  <h3 class="display-5">Ta: <?php echo (($guiData[11]-60)/2)."°C";?></h3>
-                  <h3 class="display-5">Tc: <?php echo (($guiData[14]-60)/2)."°C";?></h3>
-                  <h3 class="display-5">Td : <?php echo ($guiData[12]-30)."°C";?></h3>
-                  <h3 class="display-5">Tipm : <?php echo ($guiData[26])."°C";?></h3>
+                  <h3 class="display-5">Ta: <?php echo (($segmntedPacOne[11]-60)/2)."°C";?></h3>
+                  <h3 class="display-5">Tc: <?php echo (($segmntedPacOne[14]-60)/2)."°C";?></h3>
+                  <h3 class="display-5">Td : <?php echo ($segmntedPacOne[12]-30)."°C";?></h3>
+                  <h3 class="display-5">Tipm : <?php echo ($segmntedPacOne[26])."°C";?></h3>
                   <h3 class="display-5">On Time : <?php echo "------";?></h3>
                 </div>
               </div>
@@ -578,10 +555,10 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h3 class="display-5">DC CUR: <?php echo ($guiData[21]/10);?></h3>
-                  <h3 class="display-5">DC VOL: <?php echo ($guiData[20]*2);?></h3>
-                  <h3 class="display-5">AC CUR: <?php echo ($guiData[16]/10);?></h3>
-                  <h3 class="display-5">AC VOL : <?php echo ($guiData[15]*2);?></h3>
+                  <h3 class="display-5">DC CUR: <?php echo ($segmntedPacOne[21]/10);?></h3>
+                  <h3 class="display-5">DC VOL: <?php echo ($segmntedPacOne[20]*2);?></h3>
+                  <h3 class="display-5">AC CUR: <?php echo ($segmntedPacOne[16]/10);?></h3>
+                  <h3 class="display-5">AC VOL : <?php echo ($segmntedPacOne[15]*2);?></h3>
                   <h3 class="display-5">Off Time : <?php echo "------";?></h3>
                   <h3 class="display-5">System Type : <?php echo "------";?></h3>
                 </div>
@@ -633,41 +610,29 @@
   </script>
 </head>
 <body>
-  <form method="POST">
+  
 
 
-    <script>
-      async function uploadFile() {
-        let formData = new FormData();           
-        formData.append("file", fileupload.files[0]);
-        await fetch('./controller/checkSumUpdater.php', {
-          method: "POST", 
-          body: formData,
-          contentType: 'application/octet-stream; charset=utf-8',
-    })//.then(response => response.json())
-        .then(data => console.log(data));    
-
-      }
-    </script>
+  
 
 
-    <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
 
-    <script src="./assets/vendors/select2/select2.min.js"></script>
-    <script src="./assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+  <script src="./assets/vendors/select2/select2.min.js"></script>
+  <script src="./assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
 
-    <script src="./assets/js/off-canvas.js"></script>
-    <script src="./assets/js/hoverable-collapse.js"></script>
-    <script src="./assets/js/misc.js"></script>
-    <script src="./assets/js/settings.js"></script>
-    <script src="./assets/js/todolist.js"></script>
-    <script src="./assets/js/file-upload.js"></script>
-    <script src="./assets/js/typeahead.js"></script>
-    <script src="./assets/js/select2.js"></script>
+  <script src="./assets/js/off-canvas.js"></script>
+  <script src="./assets/js/hoverable-collapse.js"></script>
+  <script src="./assets/js/misc.js"></script>
+  <script src="./assets/js/settings.js"></script>
+  <script src="./assets/js/todolist.js"></script>
+  <script src="./assets/js/file-upload.js"></script>
+  <script src="./assets/js/typeahead.js"></script>
+  <script src="./assets/js/select2.js"></script>
 
 
-  </body>
-  </html>
+</body>
+</html>
 
 
 <!--  

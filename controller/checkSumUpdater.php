@@ -1,18 +1,52 @@
 <?php
-/* Get the name of the uploaded file */
-$filename = $_FILES['file']['name'];
+$Type = $_POST['type'];
+$Capacity = $_POST['capacity'];
+$Version = $_POST['version'];
+$Model = $_POST['Model'];
+$MobNo = $_POST['MobNo'];
+$Segment = $_POST['Segment'];
+// $Type = $_GET['type'];
+// $Capacity = $_GET['capacity'];
+// $Version = $_GET['version'];
+// $Model = $_GET['Model'];
+// $MobNo = $_GET['MobNo'];
+// $Segment = $_GET['Segment'];
+$EE_Data = array("");
 
-//$filename = "01675702741.txt";
-/* Choose where to save the uploaded file */
-$title = explode(".", $filename);
-$location = "uploads/".$title[0].".txt";
 
-/* Save the uploaded file to the local filesystem */
-if ( move_uploaded_file($_FILES['file']['tmp_name'], $location) ) { 
-  echo "<script type ='text/JavaScript'>";  
-    echo "alert('LULU  You')";  
-    echo "</script>";  
-} else { 
-  echo 'Failure'; 
+
+
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "ee_monitoring";
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
+
+$sql = "SELECT * FROM `ee_program_list` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."';";
+//echo $sql;
+$result  = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+  while($row = $result->fetch_assoc()) {
+    array_push( $EE_Data,$row);
+  }
+} else {
+  echo "0 results";
+}
+echo "<pre>";
+print_r();
+echo "</pre>";
+
+$sql = "UPDATE `live_updating_table` SET `data`='".$EE_Data[1]['segMnt_Two']."' WHERE `mobNo`='".$MobNo."';";
+  $conn->query($sql);
+  $conn->close();
 ?>
+
+
+
+<!-- SELECT * FROM `ee_program_list` WHERE `type`='IDU' AND `capacity`='12' AND `version`='1214' AND `model`='INVERNA'; -->
+
