@@ -21,6 +21,10 @@
 </head>
 <body>
   <?php
+  // DATA
+  //1;01675702741;22;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;;;;;
+
+  //1;01675702741;22;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;
   include "./controller/logics.php";
   $mobileNo = $_GET ['mobNo'];
   $servername = "localhost";
@@ -50,8 +54,9 @@
   
 
   $sql = "SELECT * FROM `dev_last_sts` WHERE `mob_no`='".$mobileNo."'; ";
+  //echo "$sql";
   $result = $conn->query($sql);
-//170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232,
+
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
       $Packet_One = $row['serial_pac_one'];
@@ -60,7 +65,7 @@
     }
     //echo $Log_Time;
   } else {
-    
+
   }
   $conn->close();
 
@@ -68,10 +73,24 @@
   $Packet_One = rtrim($Packet_One, ",");
   $segmntedPacOne = explode(",", $Packet_One);
 
+  $Packet_Two = rtrim($Packet_Two, ",");
+  $segmntedPacTwo = explode(",", $Packet_Two);
+
   //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
+  echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
 
 
-  $Alarm_clr = array("outline-secondary","danger","success","primary");
+  $Alarm_clr = array(
+    "outline-secondary", // Blank
+    "danger", //RED
+    "success",//Green
+    "primary"
+  );
+
+
+  /************ Packet One Data Acqusition *********/
+
+  $ODUType     = ODUTypeChecker($segmntedPacOne[1]);
 
   // Byte_2 Description
   // Operating Mode generated from 
@@ -79,15 +98,46 @@
   $Mode = $Byte_2[$segmntedPacOne[2]];
 
 
+  // Byte_06 Description
+  if ($segmntedPacOne[6] == 0) {
+    $Fault  = array("");
+    array_push($Fault,"OK",$Alarm_clr[2]);
+  }else{
+    $Fault  = FaultByteChecker($segmntedPacOne[6],$Alarm_clr);
+  }
 
 
-  // Byte Description
+  // Byte_07 Description
+  if ($segmntedPacOne[7] == 0) {
+    $Protection   = array("");
+    array_push($Fault,"OK",$Alarm_clr[2]);
+  }else{
+    $Protection   = ProtectionByteChecker($segmntedPacOne[7],$Alarm_clr);
+  }
+
+
+  // Byte_08 Description
+  if ($segmntedPacOne[8] == 0) {
+    $Limit   = array("");
+    array_push($Fault,"OK",$Alarm_clr[2]);
+  }else{
+    $Limit   = LimitByteChecker($segmntedPacOne[8],$Alarm_clr);
+  }
+
+  // Byte_09 Description
+  $Ts = ($segmntedPacOne[9]-60)/2;
+  // Byte_10 Description
+  $Tr = ($segmntedPacOne[10]-60)/2;
+  // Byte_13 Description
+  $Te = ($segmntedPacOne[13]-60)/2;
   $AC_Volt = $segmntedPacOne[15]*2;
   $AC_Curnt = $segmntedPacOne[16]/10;
-  $DC_Volt = $segmntedPacOne[20]*2;
-  $DC_Curnt = $segmntedPacOne[21]/10;
 
 
+
+  // Byte_17 Description
+  $ERRcode = ERRCodeDetection($segmntedPacOne[17]);
+  
 
   // Byte_18 Description
   $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
@@ -104,298 +154,270 @@
   $Byte_19 = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
   $IDU_Fan_Speed = $Byte_19[$segmntedPacOne[19]];
 
+  $DC_Volt = $segmntedPacOne[20]*2;
+  $DC_Curnt = $segmntedPacOne[21]/10;
+  $ODU_Fan_Speed = $segmntedPacOne[22]*10;
+
+
+
+
+  // Byte_27 Description
+  $Byte_27    = array("Permanent stop sign","IDU failure","mould proof","ECO mode","PFC open");
+  $FreqAlarms2= array_reverse(str_split(sprintf('%08b',  $segmntedPacOne[27]),1));
+  $permStpSgn = ($FreqAlarms2[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $IDUFail    = ($FreqAlarms2[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $MoldPrf    = ($FreqAlarms2[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $ECOMode    = ($FreqAlarms2[3] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  $PFC        = ($FreqAlarms2[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   
-  // Byte_09 Description
-  $Ts = ($segmntedPacOne[9]-60)/2;
-  // Byte_10 Description
-  $Tr = ($segmntedPacOne[10]-60)/2;
-  // Byte_13 Description
-  $Te = ($segmntedPacOne[13]-60)/2;
+
+
+  // Byte_28 Description
+  if ($segmntedPacOne[28] == 0) {
+    $DownFreq   = array("");
+    array_push($DownFreq,"OK",$Alarm_clr[2]);
+  }else{
+    $DownFreq   = DownFreqByteChecker($segmntedPacOne[28],$Alarm_clr);
+  }//echo "<pre>";print_r($DownFreq);echo "</pre>";
+
+  // Byte_32 Description
+  $RatedModeLowNibble = modeDetection($segmntedPacOne[32]);
+
+  
   // Byte_33 Description
   $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
-
-
-
-  // Byte_06 Description
-  if ($segmntedPacOne[6] = 0) {
-    $protection = array("");
-    array_push($protection,$Alarm_clr[1],"--");
-  }
-  $Fault      = MajorAlarmDetection($segmntedPacOne[6],$Alarm_clr);
-  // Byte_07 Description
-  $Protect    = Protection($segmntedPacOne[7],$Alarm_clr);
-  // Byte_07 Description
-  $Limit      = Limit_Freq($segmntedPacOne[8],$Alarm_clr);
-
-
-  
-
   //echo "<pre>";print_r($Compressor);echo "</pre>";
 
-// ------------------
-  // Frequency Display Section Data
-
-
-
-  //echo "<pre>";print_r($Mode);echo "</pre>";
-  
-
-
-
-
-
-
-
-
-
-
-
 
 
   
+  /************ Packet Two Data Acqusition *********/
   
-    //$Byte_6 = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
-  // $Byte_18 = array("Compressor on","Oil return open","Outdoor fan on","Fluoro received","Fourway valve open","Defrost on", "Test mode on","Electric heating on");
-  
-  
-
-  
-
-
-
-  //OLD
+  $FAN_IPM = $segmntedPacTwo[7];
+  $IDU_FAULT= IduFaultDetection($segmntedPacTwo[8]);
 
 
 
 
-    //$Eco        = ($guiData[27]==8) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  ?>
 
-
-  
-    //$Down       = Down_Freq($guiData[8],$Alarm_clr);
-
-
-    //$In_Flt     = ($guiData[6]>0) ? $Alarm_clr[2] : $Alarm_clr[0];
-
-
-    //echo "<pre>";print_r($Limit);echo "</pre>";
-    //echo "<pre>";print_r($guiData);echo "</pre>";
-    /*foreach ($devList as $key => $value) {
-      echo "<li class=\"nav-item menu-items\">
-        <a class=\"nav-link\" href=\"index.html\">
-          <span class=\"menu-icon\">
-            <i class=\"mdi mdi-cellphone\"></i>
-          </span><span class=\"menu-title\">"."01675702741"."</span></a></li>";
-        }*/
-
-        ?>
-
-        <div class="container-scroller">
-          <!-- partial:./partials/_sidebar.html -->
-          <nav class="sidebar sidebar-offcanvas" id="sidebar">
-            <ul class="nav">
-              <li class="nav-item profile">
-                <div class="profile-desc">
-                  <div class="profile-pic">
-                    <div class="count-indicator">
-                      <img class="img-xs rounded-circle " src="./assets/images/faces/face15.jpg" alt="">
-                      <span class="count bg-success"></span>
-                    </div>
-                    <div class="profile-name">
-                      <h5 class="mb-0 font-weight-normal">WALTON</h5>
-                      <span>Residential Air-Conditoner</span>
-                    </div>
-                  </div>
-                  <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
-                  <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list" aria-labelledby="profile-dropdown">
-                    <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="true" aria-controls="ui-basic">
-                      <span class="menu-icon">
-                        <i class="mdi mdi-laptop"></i>
-                      </span>
-                      <span class="menu-title">Basic UI Elements</span>
-                      <i class="menu-arrow"></i>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item preview-item">
-                      <div class="preview-thumbnail">
-                        <div class="preview-icon bg-dark rounded-circle">
-                          <i class="mdi mdi-onepassword  text-info"></i>
-                        </div>
-                      </div>
-                      <div class="preview-item-content">
-                        <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
-                      </div>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item preview-item">
-                      <div class="preview-thumbnail">
-                        <div class="preview-icon bg-dark rounded-circle">
-                          <i class="mdi mdi-calendar-today text-success"></i>
-                        </div>
-                      </div>
-                      <div class="preview-item-content">
-                        <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </li>
-              <li class="nav-item nav-category">
-                <span class="nav-link">Navigation</span>
-              </li>
-
-
-              <?php
-              foreach ($navDevList as $key => $value) {
-                echo "<li class=\"nav-item menu-items\">
-                <a class=\"nav-link\" data-toggle=\"collapse\" href=\"#ui-basic\" aria-expanded=\"false\" aria-controls=\"ui-basic\">
-                <span class=\"menu-icon\">
-                <i class=\"mdi mdi-laptop\"></i>
+  <div class="container-scroller">
+    <!-- partial:./partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <li class="nav-item profile">
+          <div class="profile-desc">
+            <div class="profile-pic">
+              <div class="count-indicator">
+                <img class="img-xs rounded-circle " src="./assets/images/faces/face15.jpg" alt="">
+                <span class="count bg-success"></span>
+              </div>
+              <div class="profile-name">
+                <h5 class="mb-0 font-weight-normal">WALTON</h5>
+                <span>Residential Air-Conditoner</span>
+              </div>
+            </div>
+            <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
+            <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list" aria-labelledby="profile-dropdown">
+              <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="true" aria-controls="ui-basic">
+                <span class="menu-icon">
+                  <i class="mdi mdi-laptop"></i>
                 </span>
-                <span class=\"menu-title\">".$value['mob_no']."</span>                  
-                </a>                
-                </li>";
-              }
-              ?>            
-            </ul>
-          </nav>
-          <!-- partial -->
-          <div class="container-fluid page-body-wrapper">
-            <!-- partial:./partials/_navbar.html -->
-            <nav class="navbar p-0 fixed-top d-flex flex-row">
-              <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-                <a class="navbar-brand brand-logo-mini" href="./index.html"><img src="./assets/images/logo-mini.svg" alt="logo" /></a>
-              </div>
-              <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
-                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-                  <span class="mdi mdi-menu"></span>
-                </button>                
-                <ul class="navbar-nav navbar-nav-right">
+                <span class="menu-title">Basic UI Elements</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-onepassword  text-info"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-calendar-today text-success"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item nav-category">
+          <span class="nav-link">Navigation</span>
+        </li>
 
-                </ul>
-                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-                  <span class="mdi mdi-format-line-spacing"></span>
-                </button>
-              </div>
-            </nav>
-            <!-- partial -->
-            <div class="main-panel">
-              <div class="content-wrapper">
-                <div class="col-12 grid-margin stretch-card">
-                  <div class="col-8 card corona-gradient-card">
-                    <div class="card-body py-0 px-0 px-sm-3">
-                      <div class="row align-items-center">
 
-                        <div class="col-5 col-sm-7 col-xl-8 p-0">
-                          <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
-                          <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ("20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36]); ?></h4>
-                          <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
-                          <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
+        <?php
+        foreach ($navDevList as $key => $value) {
+          echo "<li class=\"nav-item menu-items\">
+          <a class=\"nav-link\" data-toggle=\"collapse\" href=\"#ui-basic\" aria-expanded=\"false\" aria-controls=\"ui-basic\">
+          <span class=\"menu-icon\">
+          <i class=\"mdi mdi-laptop\"></i>
+          </span>
+          <span class=\"menu-title\">".$value['mob_no']."</span>                  
+          </a>                
+          </li>";
+        }
+        ?>            
+      </ul>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:./partials/_navbar.html -->
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="./index.html"><img src="./assets/images/logo-mini.svg" alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>                
+          <ul class="navbar-nav navbar-nav-right">
+
+          </ul>
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="col-12 grid-margin stretch-card">
+            <div class="col-8 card corona-gradient-card">
+              <div class="card-body py-0 px-0 px-sm-3">
+                <div class="row align-items-center">
+
+                  <div class="col-5 col-sm-7 col-xl-8 p-0">
+                    <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
+                    <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ("20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36]); ?></h4>
+                    <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
+                    <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6 grid-margin stretch-card">
+              <div class="card-body">
+                <br>
+                <div class="row">
+
+                  <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="text-muted font-weight-normal">Target Frequency</h5>
+                        <div class="row">
+                          <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                              <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[4]);?></h3>
+                              <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                          </div>                          
                         </div>
+
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col-lg-6 grid-margin stretch-card">
-                    <div class="card-body">
 
-                      <br>
-                      <div class="row">
-                        <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
-                          <div class="card">
-                            <div class="card-body">
-                              <h5 class="text-muted font-weight-normal">Target Frequency</h5>
-                              <div class="row">
-                                <div class="col-9">
-                                  <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[4]);?></h3>
-                                    <p class="text-success ml-2 mb-0 font-weight-medium"></p>
-                                  </div>
-                                </div>                          
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
-                          <div class="card">
-                            <div class="card-body">
-                              <h5 class="text-muted font-weight-normal">Set Frequency</h5>
-                              <div class="row">
-                                <div class="col-9">
-                                  <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[5]);?></h3>
-                                    <p class="text-success ml-2 mb-0 font-weight-medium"></p>
-                                  </div>
-                                </div>                          
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
-                          <div class="card">
-                            <div class="card-body">
-                              <h6 class="text-muted font-weight-normal">Real Frequency</h6>
-                              <div class="row">
-                                <div class="col-9">
-                                  <div class="d-flex align-items-left align-self-start">
-                                    <h3 class="mb-0"><?php echo ($segmntedPacOne[3]);?></h3>
-                                    <p class="text-danger ml-2 mb-0 font-weight-medium">Hz</p>
-                                  </div>
-
-                                  <div class="d-flex align-items-left align-self-start">
-                                    <h3 class="mb-0"><?php echo (" ".$segmntedPacOne[3]*60);?></h3>
-                                    <p class="text-danger ml-2 mb-0 font-weight-medium">rpm</p>
-                                  </div>
-                                </div>                          
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>                  
-                      </div>                
-                    </div>              
-                  </div>
-                  <div class="col-lg-3 grid-margin stretch-card">
-                    <div class="row">
+                  <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+                    <div class="card">
                       <div class="card-body">
-                        <h4 class="card-title">Major Fault</h4>
-                        <div class="table-responsive">
-                          <table class="table">
-                            <tbody>
-                              <tr>
-                                <td>Fault</td>
-                                <td><button type="button" class="btn btn-<?php echo $Fault[0];?> btn-rounded btn-icon"></button></td>
-                                <td><?php 
-                                for ($i=1; $i < count($Fault) ; $i++) { 
-                                  echo $Fault[$i]."</br>";                        }
-                                ?></td>
-                              </tr>
-                              <tr>
-                                <td>Protect</td>
-                                <td><button type="button" class="btn btn-<?php echo $protection[0];?> btn-rounded btn-icon">
-                                </button></td>
-                                <!-- <td><?php 
-                                for ($i=1; $i < count($Protect) ; $i++) { 
-                                  echo $Protect[$i]."</br>";                        }
-                                ?></td> -->
-                                <td><?php echo $protection[1]; ?></td>
-                              </tr>
-                              <tr>
-                                <td>Limit Freq</td>
-                                <td><button  class="btn btn-<?php echo $Limit[0];?> btn-rounded btn-icon">
-                                </button></td>
-                                <td><?php 
-                                for ($i=1; $i < count($Limit) ; $i++) { 
-                                  echo $Limit[$i]."</br>";                        }
-                                ?></td>
-                              </tr>
-                              <tr>
-                                <td>Down Freq</td>
-                          <td><!-- <button type="button" class="btn btn-danger btn-rounded btn-icon">
-                          </button> --></td>
+                        <h5 class="text-muted font-weight-normal">Set Frequency</h5>
+                        <div class="row">
+                          <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                              <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[5]);?></h3>
+                              <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                          </div>                          
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+                    <div class="card">
+                      <div class="card-body">
+                        <h6 class="text-muted font-weight-normal">Real Frequency</h6>
+                        <div class="row">
+                          <div class="col-9">
+                            <div class="d-flex align-items-left align-self-start">
+                              <h3 class="mb-0"><?php echo ($segmntedPacOne[3]);?></h3>
+                              <p class="text-danger ml-2 mb-0 font-weight-medium">Hz</p>
+                            </div>
+
+                            <div class="d-flex align-items-left align-self-start">
+                              <h3 class="mb-0"><?php echo (" ".$segmntedPacOne[3]*60);?></h3>
+                              <p class="text-danger ml-2 mb-0 font-weight-medium">rpm</p>
+                            </div>
+                          </div>                          
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>  
+
+                  <div class="col-xl-8 col-sm-6 grid-margin stretch-card">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="text-muted font-weight-normal">ERROR Code</h5>
+                        <div class="row">
+                          <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                              <h3 class="mb-0"><?php echo $ERRcode;?></h3>
+                              <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                          </div>                          
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>                
+              </div>              
+            </div>
+            <div class="col-lg-3 grid-margin stretch-card">
+              <div class="row">
+                <div class="card-body">
+                  <h4 class="card-title">Major Fault</h4>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <td>Fault</td>
+                          <td><button type="button" class="btn btn-<?php echo $Fault[2];?> btn-rounded btn-icon"></button></td>
+                          <td><?php echo $Fault[1];?></td>
+                        </tr>
+                        <tr>
+                          <td>Protection</td>
+                          <td><button type="button" class="btn btn-<?php echo $Protection[2];?> btn-rounded btn-icon">
+                          </button></td>
+                          <td><?php echo $Protection[1];?></td>
+                        </tr>
+                        <tr>
+                          <td>Limit Freq</td>
+                          <td><button  class="btn btn-<?php echo $Limit[2];?> btn-rounded btn-icon">
+                          </button></td>
+                          <td><?php  echo $Limit[1];?></td>
+                        </tr>
+                        <tr>
+                          <td>Down Freq</td>
+                          <td><button type="button" class="btn btn-<?php echo $DownFreq[2];?> btn-rounded btn-icon">
+                          </button></td>
+                          <td><?php  echo $DownFreq[1];?></td>
                         </tr>
                       </tbody>
                     </table>
@@ -448,7 +470,7 @@
                           <td><button type="button" class="btn btn-<?php //echo $Compressor;?> btn-rounded btn-icon">
                           </button></td>
                           <td>E C O</td>
-                          <td><button type="button" class="btn btn-<?php echo $Eco;?> btn-rounded btn-icon">
+                          <td><button type="button" class="btn btn-<?php echo $ECOMode;?> btn-rounded btn-icon">
                           </button></td>                          
                         </tr>
                         <tr>
@@ -466,6 +488,7 @@
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-12 grid-margin stretch-card">
               <div class="card corona-gradient-card">
@@ -484,7 +507,7 @@
               <div class="card-body">
                 <div class="template-demo">
                   <h1 class="display-5">Mode: <?php echo $Mode;?></h1>
-                  <h1 class="display-5">Rated Mode: <?php echo "----";?></h1>
+                  <h1 class="display-5">Rated Mode: <?php echo $RatedModeLowNibble;?></h1>
                 </div>
               </div>
             </div>
@@ -500,7 +523,7 @@
               <div class="card-body">
                 <div class="template-demo">
                   <h1 class="display-5">Te: <?php echo $Te."°C";?></h1>
-                  <h1 class="display-5">Customer : <?php echo "------";?></h1>
+                  <h1 class="display-5">IDU Fault : <?php print_r($IDU_FAULT[1]);?></h1>
                 </div>
               </div>
             </div>
@@ -512,6 +535,7 @@
                 </div>
               </div>
             </div>
+
 
           </div>
           <div class="row">
@@ -533,10 +557,11 @@
                 <div class="template-demo">
                   <h3 class="display-5">Area: <?php echo "----";?></h3>
                   <h3 class="display-5">Fan Level: <?php echo "----";?></h3>
-                  <h3 class="display-5">Fan rpm: <?php echo "----";?></h3>
+                  <h3 class="display-5">Fan rpm: <?php echo $ODU_Fan_Speed;?></h3>
                   <h3 class="display-5">Drv Fault : <?php echo "------";?></h3>
                   <h3 class="display-5">EEV : <?php echo "------";?></h3>
                   <h3 class="display-5">Comp Type : <?php echo "------";?></h3>
+                  <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
                 </div>
               </div>
             </div>
@@ -548,7 +573,7 @@
                   <h3 class="display-5">Tc: <?php echo (($segmntedPacOne[14]-60)/2)."°C";?></h3>
                   <h3 class="display-5">Td : <?php echo ($segmntedPacOne[12]-30)."°C";?></h3>
                   <h3 class="display-5">Tipm : <?php echo ($segmntedPacOne[26])."°C";?></h3>
-                  <h3 class="display-5">On Time : <?php echo "------";?></h3>
+                  <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
                 </div>
               </div>
             </div>
@@ -564,9 +589,9 @@
                 </div>
               </div>
             </div>
-            
+
           </div>
-          
+
         </div>
 
         <!-- partial:./partials/_footer.html -->
@@ -610,10 +635,10 @@
   </script>
 </head>
 <body>
-  
 
 
-  
+
+
 
 
   <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
