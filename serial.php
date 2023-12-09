@@ -77,7 +77,7 @@
   $segmntedPacTwo = explode(",", $Packet_Two);
 
   //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
-  echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
+  //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
 
 
   $Alarm_clr = array(
@@ -467,15 +467,15 @@
                         </tr>
                         <tr>
                           <td>Proof</td>
-                          <td><button type="button" class="btn btn-<?php //echo $Compressor;?> btn-rounded btn-icon">
+                          <td><button type="button" class="btn btn-<?php echo $MoldPrf;?> btn-rounded btn-icon">
                           </button></td>
                           <td>E C O</td>
                           <td><button type="button" class="btn btn-<?php echo $ECOMode;?> btn-rounded btn-icon">
                           </button></td>                          
                         </tr>
                         <tr>
-                          <td>Ever Off</td>
-                          <td><button type="button" class="btn btn-<?php //echo $Compressor;?> btn-rounded btn-icon">
+                          <td>PFC</td>
+                          <td><button type="button" class="btn btn-<?php echo $PFC;?> btn-rounded btn-icon">
                           </button></td>
                           <td>In Fault</td>
                           <td><button type="button" class="btn btn-<?php echo $In_Flt;?> btn-rounded btn-icon">

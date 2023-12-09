@@ -266,19 +266,23 @@ function ODUTypeChecker($DataVal)
 
 	if($Bits[4] == 1){
 		return $ODU_MCU_Type[0];
-		break;
+		//break;
 	}
-	if($Bits[5] == 1){
+	else if($Bits[5] == 1){
 		return $ODU_MCU_Type[1];
-		break;
+		//break;
 	}
-	if($Bits[6] == 1){
+	else if($Bits[6] == 1){
 		return $ODU_MCU_Type[2];
-		break;
+		//break;
 	}
-	if($Bits[7] == 1){
+	else if($Bits[7] == 1){
 		return $ODU_MCU_Type[3];
-		break;
+		//break;
+	}
+	else{
+		return "Not Detected";
+		//break;
 	}
 	//echo "<pre>";print_r($Bits);echo "</pre>";
 	//return $result;
