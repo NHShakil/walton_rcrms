@@ -2,6 +2,10 @@
 // DATA Formate
 //http://localhost/ac_monitoring/controller/devlogs.php/?data=3;01675702741;22;22,1,45,10,8,0,0,128,92,124,151,125,96,163;118,49,0,160,5,166,66,3,35;1,0,72,0,0,1,0,110,0;104,20,11,6,100,1,45,10,8,0,0,128,92,124,151;118,49,0,160,5,166,66,11,6,100,1,45,10,8,0,0,128
 
+
+//http://103.243.142.11/walton_rcrms/controller/devlogs.php/?data=1;01608984560;;;;
+
+
 // PRAM Packet Explanation
 // Device ID   		= $pram[0]
 // Mobile No   		= $pram[1]
@@ -25,7 +29,6 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "ee_monitoring";
-
 
 
 // Create connection
@@ -56,7 +59,7 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		
 
 	} else {
-	// IF NOT FOUND
+		// IF NOT FOUND
 		// Creat New Row in Device Last status Table
 		$sql = "INSERT INTO `dev_last_sts` (`id`, `dev_id`, `mob_no`, `signal_Lvl`, `serial_pac_one`, `serial_pac_two`, `idu_ee`, `odu_ee`, `created`, `modified`) VALUES (NULL, '".$pram[0]."','".$pram[1]."','".$pram[2]."','".$pram[3]."','".$pram[4]."','".$pram[5]."','".$pram[6]."', current_timestamp(), current_timestamp());";
 			$conn->query($sql);
@@ -65,61 +68,16 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 			$conn->query($sql);
 			echo $sql;
 		}
+		
+
+		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='01608984560';";
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				$EE_Data =  $row["data"];
+			}
+		}
 		$conn->close();
 
-
-
-		?>
-
-
-
-
-<!-- 
-
-// Create connection
-// $conn = new mysqli($servername, $username, $password, $dbname);
-// // Check connection
-// if ($conn->connect_error) {
-// 	die("Connection failed: " . $conn->connect_error);
-// }
-
-// $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES (NULL, NULL, '".$rcvData."', current_timestamp(), current_timestamp());";
-
-// 	if ($conn->query($sql) === TRUE) {
-// 	//echo "New record created successfully";
-// 	} else {
-// 	//echo "Error: " . $sql . "<br>" . $conn->error;
-// 	}
-// 	$conn->close();
-
-
-
-// 
-// //echo $sql;
-// if ($conn->query($sql) === TRUE) { 
-
-// } else {
-
-// }
-
-
-
-//$conn->close();
-
-// $myfile = fopen("./uploads/01675702741-D.txt", "r") or die("Unable to open file!");
-// echo fread($myfile,filesize("./uploads/01675702741-D.txt"));
-// //fwrite($myfile, $data);
-// fclose($myfile);
-//print_r(file_get_contents("./uploads/01675702741.txt"));
-
-// $file = fopen("./uploads/01675702741.txt", "r");
-
-// //Output lines until EOF is reached
-// while(! feof($file)) {
-//   $line = fgets($file);
-//   echo $line. "<br>";
-// }
-
-// fclose($file);
-
- -->
+		print_r("IDU,127,256,".$EE_Data);
+	?>
