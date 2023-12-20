@@ -24,7 +24,6 @@
   // DATA
   //1;01675702741;22;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;;;;;
 
-  //1;01675702741;22;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;170,16,1,71,13,13,0,0,2,93,123,140,74,92,137,116,98,0,176,6,182,93,3,50,1,153,85,16,0,1,0,110,0,116,23,9,11,232;
   include "./controller/logics.php";
   $mobileNo = $_GET ['mobNo'];
   $servername = "localhost";
@@ -59,19 +58,28 @@
 
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+      //print_r($result);
       $Packet_One = $row['serial_pac_one'];
       $Packet_Two = $row['serial_pac_two'];
       $Log_Time   = $row['modified'];
     }
     //echo $Log_Time;
   } else {
+    //echo "No data Found";
 
   }
   $conn->close();
 
-
-  $Packet_One = rtrim($Packet_One, ",");
-  $segmntedPacOne = explode(",", $Packet_One);
+  //print_r($result);
+  
+  if ($Packet_One == NULL) {
+    $segmntedPacOne =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
+  }else{
+    $Packet_One = rtrim($Packet_One, ",");
+    $segmntedPacOne =  explode(",", $Packet_One) ; 
+  }
+  
+  //$segmntedPacOne = ;
 
   $Packet_Two = rtrim($Packet_Two, ",");
   $segmntedPacTwo = explode(",", $Packet_Two);
@@ -110,7 +118,7 @@
   // Byte_07 Description
   if ($segmntedPacOne[7] == 0) {
     $Protection   = array("");
-    array_push($Fault,"OK",$Alarm_clr[2]);
+    array_push($Protection,"OK",$Alarm_clr[2]);
   }else{
     $Protection   = ProtectionByteChecker($segmntedPacOne[7],$Alarm_clr);
   }
@@ -119,7 +127,7 @@
   // Byte_08 Description
   if ($segmntedPacOne[8] == 0) {
     $Limit   = array("");
-    array_push($Fault,"OK",$Alarm_clr[2]);
+    array_push($Limit,"OK",$Alarm_clr[2]);
   }else{
     $Limit   = LimitByteChecker($segmntedPacOne[8],$Alarm_clr);
   }
@@ -140,15 +148,24 @@
   
 
   // Byte_18 Description
-  $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
-  $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-  $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-
+  if(($segmntedPacOne[18])==0){
+    //print_r("FUCk.....");
+    $Compressor = $Alarm_clr[0];
+    $RetnOil = $Alarm_clr[0];
+    $OutFan = $Alarm_clr[0];
+    $FourWay= $Alarm_clr[0];
+    $TestMod= $Alarm_clr[0];
+    $PreHeat= $Alarm_clr[0];
+  }else{
+    $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
+    $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+  }
   // Byte_19 Description
   // Indoor FAN Wind Speed Level
   $Byte_19 = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
@@ -188,11 +205,16 @@
   $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
   //echo "<pre>";print_r($Compressor);echo "</pre>";
 
-
+  $version = "20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36];
 
   
   /************ Packet Two Data Acqusition *********/
-  
+  if ($Packet_Two == NULL) {
+    $segmntedPacTwo =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
+  }else{
+    $Packet_Two = rtrim($Packet_Two, ",");
+    $segmntedPacOne =  explode(",", $Packet_Two) ; 
+  }
   $FAN_IPM = $segmntedPacTwo[7];
   $IDU_FAULT= IduFaultDetection($segmntedPacTwo[8]);
 
@@ -299,7 +321,7 @@
 
                   <div class="col-5 col-sm-7 col-xl-8 p-0">
                     <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
-                    <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ("20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36]); ?></h4>
+                    <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ($version); ?></h4>
                     <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
                     <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
                   </div>
