@@ -21,7 +21,7 @@
 
 $rcvData = $_GET['data'];
 $pram = explode(";", $rcvData);
-echo "<pre>";print_r($pram);echo "</pre>";
+//echo "<pre>";print_r($pram);echo "</pre>";
 $DBMatchtID = "";
 
 // DB Setup
@@ -78,6 +78,5 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 			}
 		}
 		$conn->close();
-
-		print_r("IDU,127,256,".$EE_Data);
+		//print_r("IDU,128,127,".$EE_Data);
 	?>
