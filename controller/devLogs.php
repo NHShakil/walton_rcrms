@@ -71,25 +71,63 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		}
 		
 
-		$EE_Data = "SRV,";
+		
 		$sql = "SELECT * FROM `live_device` WHERE `mob_no`='".$pram[1]."';";
-		//echo $sql;
-
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				$EE_Data .=  $row["cmd"].",";
+				$opCMD =  $row["cmd"].",";
 			}
 		}
-
-		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
-		$result = $conn->query($sql);
-		if ($result->num_rows > 0) {
-			while($row = $result->fetch_assoc()) {
-				$EE_Data .=  $row["data"];
+		//echo $opCMD."-------";
+		$EE_Data = "";
+		// Server Connectivity only. Nocommand for Device
+		if($opCMD == 0){
+			$EE_Data .= "SRV,0";
+		}
+		// Serail Communication Only
+		else if($opCMD == 1){
+			$EE_Data .= "SRL,1";
+		}
+		// Write IDU CheckSUM
+		else if($opCMD == 2){
+			$EE_Data = "WIC,2,";
+			$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+				while($row = $result->fetch_assoc()) {
+					$EE_Data .=  $row["data"];
+				}
+			}
+		}
+		// Write ODU CheckSUM
+		else if($opCMD == 3){
+			$EE_Data = "WOC,3,";
+			$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+				while($row = $result->fetch_assoc()) {
+					$EE_Data .=  $row["data"];
+				}
 			}
 		}
 		$conn->close();
 
+		// Read IDU CheckSUm
+		else if($opCMD == 4){
+			$EE_Data .= "RIC,4";
+		}
+		// Read ODU CheckSUm
+		else if($opCMD == 5){
+			$EE_Data .= "ROC,5";
+		}
+		// Compressor Model No Read
+		else if($opCMD == 6){
+			$EE_Data .= "CMN,5";
+		}
+		else{
+			$EE_Data .= "SRV,0";
+		}
+		
 		print_r($EE_Data);
 	?>
