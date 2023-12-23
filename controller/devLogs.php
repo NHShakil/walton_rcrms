@@ -52,6 +52,7 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		}
 		// UPDATE Device Last status Table
 		$sql = "UPDATE `dev_last_sts` SET `mob_no`='".$pram[1]."',`signal_Lvl`='".$pram[2]."',`serial_pac_one`='".$pram[3]."',`serial_pac_two`='".$pram[4]."',`idu_ee`='".$pram[5]."',`odu_ee`='".$pram[6]."',`modified`=current_timestamp() WHERE `id`='".$DBMatchtID."'; ";
+		echo $sql;
 		$conn->query($sql);
 		// UPDATE Device Last status Table
 		$sql = "UPDATE `live_device` SET `mob_no`='".$pram[1]."',`status`='1',`modified`=current_timestamp() WHERE `device_Id` = '".$pram[0]."';";
@@ -70,7 +71,17 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		}
 		
 
-		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='01608984560';";
+		$EE_Data = "SRV,";
+
+		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				$EE_Data .=  $row["cmd"].",";
+			}
+		}
+
+		$sql = "SELECT * FROM `live_device` WHERE `mobNo`='".$pram[1]."';";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
@@ -79,5 +90,5 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		}
 		$conn->close();
 
-		print_r("IDU,127,256,".$EE_Data);
+		print_r($EE_Data);
 	?>
