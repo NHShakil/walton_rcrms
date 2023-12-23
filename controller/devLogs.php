@@ -21,7 +21,7 @@
 
 $rcvData = $_GET['data'];
 $pram = explode(";", $rcvData);
-echo "<pre>";print_r($pram);echo "</pre>";
+//echo "<pre>";print_r($pram);echo "</pre>";
 $DBMatchtID = "";
 
 // DB Setup
@@ -52,7 +52,7 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		}
 		// UPDATE Device Last status Table
 		$sql = "UPDATE `dev_last_sts` SET `mob_no`='".$pram[1]."',`signal_Lvl`='".$pram[2]."',`serial_pac_one`='".$pram[3]."',`serial_pac_two`='".$pram[4]."',`idu_ee`='".$pram[5]."',`odu_ee`='".$pram[6]."',`modified`=current_timestamp() WHERE `id`='".$DBMatchtID."'; ";
-		echo $sql;
+
 		$conn->query($sql);
 		// UPDATE Device Last status Table
 		$sql = "UPDATE `live_device` SET `mob_no`='".$pram[1]."',`status`='1',`modified`=current_timestamp() WHERE `device_Id` = '".$pram[0]."';";
@@ -67,13 +67,14 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		// Creat New Row in Live status Table of device
 			$sql = "INSERT INTO `live_device` (`id`, `device_Id`, `mob_no`, `status`, `created`, `modified`) VALUES (NULL, ".$pram[0].", ".$pram[1].", '1', current_timestamp(), current_timestamp());";
 			$conn->query($sql);
-			echo $sql;
+
 		}
 		
 
 		$EE_Data = "SRV,";
+		$sql = "SELECT * FROM `live_device` WHERE `mob_no`='".$pram[1]."';";
+		//echo $sql;
 
-		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
@@ -81,11 +82,11 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 			}
 		}
 
-		$sql = "SELECT * FROM `live_device` WHERE `mobNo`='".$pram[1]."';";
+		$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				$EE_Data =  $row["data"];
+				$EE_Data .=  $row["data"];
 			}
 		}
 		$conn->close();
