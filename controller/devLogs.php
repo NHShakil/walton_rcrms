@@ -99,6 +99,7 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 					$EE_Data .=  $row["data"];
 				}
 			}
+			$conn->close();
 		}
 		// Write ODU CheckSUM
 		else if($opCMD == 3){
@@ -110,8 +111,9 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 					$EE_Data .=  $row["data"];
 				}
 			}
+			$conn->close();
 		}
-		$conn->close();
+		
 
 		// Read IDU CheckSUm
 		else if($opCMD == 4){
@@ -128,6 +130,6 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 		else{
 			$EE_Data .= "SRV,0";
 		}
-		
+
 		print_r($EE_Data);
 	?>

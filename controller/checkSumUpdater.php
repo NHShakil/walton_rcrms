@@ -15,8 +15,6 @@ $EE_Data = array("");
 
 
 
-
-
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -27,7 +25,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "SELECT * FROM `ee_program_list` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."';";
-//echo $sql;
+echo $sql;
 $result  = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -37,16 +35,30 @@ if ($result->num_rows > 0) {
 } else {
   echo "0 results";
 }
-echo "<pre>";
-print_r();
-echo "</pre>";
+// echo "<pre>";
+// print_r($EE_Data[1]['segMnt_Two']);
+// echo "</pre>";
 
-$sql = "UPDATE `live_updating_table` SET `data`='".$EE_Data[1]['segMnt_Two']."' WHERE `mobNo`='".$MobNo."';";
+
+if($Segment == '1'){
+  $ee_seg = $EE_Data[1]['segMnt_Two'];
+}
+if($Segment == '2'){
+  $ee_seg = $EE_Data[1]['segMnt_Three'];
+}
+if($Segment == '3'){
+  $ee_seg = $EE_Data[1]['segMnt_Four'];
+}
+if($Segment == '4'){
+  $ee_seg = "";
+}
+
+$sql = "UPDATE `live_updating_table` SET `data`='".$ee_seg."' WHERE `mobNo`='".$MobNo."';";
   $conn->query($sql);
   $conn->close();
+//   echo "<pre>";
+// print_r($sql);
+// echo "</pre>";
 ?>
 
-
-
-<!-- SELECT * FROM `ee_program_list` WHERE `type`='IDU' AND `capacity`='12' AND `version`='1214' AND `model`='INVERNA'; -->
 
