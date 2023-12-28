@@ -172,7 +172,7 @@
                 <div class="card-body">
                   <div class="row"><img src="./assets/images/faces/odu.png" alt="" width="100%" height="50%">
                   </div>
-                  <a class="nav-link" href="oduEE.php">
+                  <a class="nav-link" href="oduEE.php?mobNo=<?php echo $mobileNo;?>">
                     <h3 class="mb-0" align="center">ODU EE Program</h3>
                   </a>             
                 </div>

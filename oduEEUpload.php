@@ -57,7 +57,7 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  $sql = "SELECT * FROM `ee_program_list` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."'; ";
+  $sql = "SELECT * FROM `ee_program_list_odu` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."'; ";
   $result = $conn->query($sql);
 
   if ($result->num_rows > 0) {
@@ -307,27 +307,53 @@
   <script type="text/javascript">
     const countdownEl = document.querySelector(".countdown");
     const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 160; // seconds
+    let remainingTime = 240; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 120){
+        if(remainingTime == 230){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 80){
+        if(remainingTime == 220){
           EE_segMent++;
           console.log("BAL:"+EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 40){
+        if(remainingTime == 210){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
+        if(remainingTime == 200){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 190){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 180){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 170){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 160){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+
         if(remainingTime == 2){
           EE_segMent++;
           console.log(EE_segMent);
@@ -350,7 +376,7 @@
     function updateEESeg(argument) {
       $.ajax({
         type: 'POST',
-        url:  'controller/checkSumUpdater.php/',
+        url:  'controller/oducheckSumUpdater.php/',
         data: { 
           type:"<?php echo $Type;?>",
           capacity:"<?php echo $Capacity;?>",

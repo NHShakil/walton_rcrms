@@ -25,7 +25,7 @@
   $username = "root";
   $password = "";
   $dbname = "ee_monitoring";
-
+  $mobNo = $_GET['mobNo'];
 
   $devList = array();
   $conn = new mysqli($servername, $username, $password, $dbname);
@@ -147,7 +147,7 @@
           <a class="navbar-brand brand-logo-mini" href="./index.html"><img src="./assets/images/logo-mini.svg" alt="logo" /></a>
         </div>
         <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
-          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize" onclick="">
             <span class="mdi mdi-menu"></span>
           </button>                
           <ul class="navbar-nav navbar-nav-right">
@@ -163,140 +163,127 @@
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="col-12 grid-margin stretch-card">
-            <div class="card-body">
-              <h4 class="card-title">EEPROM SEGMENT : 01</h4>
-              <button type="button" class="btn btn-danger btn-icon-text" onclick="uploadEEDataO()">
-                <i class="mdi mdi-upload btn-icon-prepend"></i> Upload 
-              </button>
-              
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>ADDRESS</th>
-                      <th>FILE DATA</th>
-                      <th>DEVICE DATA</th>
-                      <th>REMARKS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    /*$hexDataO = "IDU,0,127,";
-                    for ($i=1; $i <= 128 ; $i++) { 
-                      $hexDataO .=hexdec($SEGMNT[$i]) .","; 
-                      echo "<tr>
-                      <td>".number_format($i) ."</td>                            
-                      <td class=\"text-success\"> ".strtoupper($SEGMNT[$i])." </td>
-                      <td class=\"text-danger\"> 00 </td>
-                      <td> N/A </td>
-                      </tr>";                      
-                    }*/
-                    ?>                    
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div class="card-body">
-              <h4 class="card-title">EEPROM SEGMENT : 02</h4>
-              <button type="button" class="btn btn-danger btn-icon-text" onclick="uploadEEDataT()">
-                <i class="mdi mdi-upload btn-icon-prepend"></i> Upload 
-              </button>
-              
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>ADDRESS</th>
-                      <th>FILE DATA</th>
-                      <th>DEVICE DATA</th>
-                      <th>REMARKS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div> 
+          <div class="row">
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">EE Program Selection</h4>
+                  <form action="oduEEUpload.php?" method="POST">
+                    <div id ="formData" class="form-group">
 
+                      <label name= "MobNo">Device Sim No.</label>
+                      <input type="text" class="form-control" name="MobNo" value="<?php echo $mobNo;?>" placeholder="<?php echo $mobNo;?>">
+                    </div>
+                    <div id ="formData" class="form-group">
+                      <label for="exampleFormControlSelect2">Capacity</label>
+                      <select id="Capacity" class="form-control" name="capacity" >
+                        <option value="12">12K </option>
+                        <option value="18">18K </option>
+                        <option value="24">24K </option>
+                        <option value="30">30K </option>
+
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect1">Unit Type</label>
+                      <select id="UnitType" class="form-control form-control"   onchange="getCapacity()" name="type">
+                        <option value="--"> Select Type </option>
+                        <option value="IDU"> IDU </option>
+                        <option value="ODU"> ODU </option>
+
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect3">Version</label>
+                      <select id ="version" class="form-control form-control-sm" name="version" >                       
+
+
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect3">Model</label>
+                      <select class="form-control form-control-sm" name="Model">
+                        <option value="INVERNA">Inverna</option>
+                        <option value="KRYSTALINE">Krystaline</option>
+                        <option value="DIAMOND">Diamond</option>
+                      </select>
+                    </div>                    
+                    <input type="submit" class="btn btn-primary mr-2" value="Submit">
+                  </form>
+                </div>
+              </div>              
+            </div>
+
+          </div>
         </div>
+
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Product of <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank"> Residential Air Conditoner</a> Research & Innovation</span>
+          </div>
+        </footer>
+
       </div>
-      <!-- main-panel ends -->
     </div>
-    <!-- page-body-wrapper ends -->
   </div>
-
-
 </body>
-
 <script src="js/jquery-1.11.2.min.js"></script>
-<script>
-    //var submittedMessage = $(':text[name="message"]').val();
-  function formateEEFile(argument) {
-      // body...
+<script type="text/javascript">
+ function getCapacity(){
 
-    $.ajax({
-     type: 'GET',
-     url:  'controller/formate.php',
-     data: { }
-   })
-    .done( function (responseText) {
-            // Triggered if response status code is 200 (OK)
-      //$('#message').html('Your message is: ' + responseText);
-    })
-    .fail( function (jqXHR, status, error) {
-            // Triggered if response status code is NOT 200 (OK)
-      alert("Fail;")
-    })
-    .always( function() {
-            // Always run after .done() or .fail()
-      $('p:first').after('<p>Thank you.</p>');
-    });
-  }
-</script>
-</head>
+  var capacity = $("#Capacity").val();
+  var argument = $("#UnitType").val();
+  $.ajax({
+   type: 'GET',
+   url:  'controller/modelSelector.php/?Data='+capacity+","+argument,
+   data: { }
+ })
+  .done( function (version) {
 
-<form method="POST">
+      //var data  = JSON.stringify(version);
 
-
-  <script>
-    async function uploadFile() {
-      let formData = new FormData();           
-      formData.append("file", fileupload.files[0]);
-      await fetch('./controller/checkSumUpdater.php', {
-        method: "POST", 
-        body: formData,
-        contentType: 'application/octet-stream; charset=utf-8',
-    })//.then(response => response.json())
-      .then(data => console.log(data));    
-
+    var ver  = version.split(",");
+    $("#version").empty();
+    for (var i = 0; i < ver.length; i++) {
+      $("#version").append("<option value =\""+ver[i]+"\">"+ver[i]+"</option>");
     }
-  </script>
-
-
-  <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
-
-  <script src="./assets/vendors/select2/select2.min.js"></script>
-  <script src="./assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
-
-  <script src="./assets/js/off-canvas.js"></script>
-  <script src="./assets/js/hoverable-collapse.js"></script>
-  <script src="./assets/js/misc.js"></script>
-  <script src="./assets/js/settings.js"></script>
-  <script src="./assets/js/todolist.js"></script>
-  <script src="./assets/js/file-upload.js"></script>
-  <script src="./assets/js/typeahead.js"></script>
-  <script src="./assets/js/select2.js"></script>
+  })   
+  .fail( function (jqXHR, status, error) {
+            // Triggered if response status code is NOT 200 (OK)
+    alert("Fail;")
+  })
+  .always( function() {
+            // Always run after .done() or .fail()
+    $('p:first').after('<p>Thank you.</p>');
+  });
+}
 
 
 
-  </html>
+function getUploadGUI(argument) {
+
+}
+
+</script>
+<script src="./assets/vendors/js/vendor.bundle.base.js"></script>
+
+<script src="./assets/vendors/select2/select2.min.js"></script>
+<script src="./assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+
+<script src="./assets/js/off-canvas.js"></script>
+<script src="./assets/js/hoverable-collapse.js"></script>
+<script src="./assets/js/misc.js"></script>
+<script src="./assets/js/settings.js"></script>
+<script src="./assets/js/todolist.js"></script>
+<script src="./assets/js/file-upload.js"></script>
+<script src="./assets/js/typeahead.js"></script>
+<script src="./assets/js/select2.js"></script>
 
 
-<!--  
 
-RndacGps@#786
 
--->
+
+
+
