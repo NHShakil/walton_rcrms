@@ -105,6 +105,12 @@
   $Byte_2     = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
   $Mode = $Byte_2[$segmntedPacOne[2]];
 
+  $Real_Freq = $segmntedPacOne[3];
+  $Real_Freq_RPM = $segmntedPacOne[3]*60;
+  $targ_Freq = $segmntedPacOne[4];
+  $Set_Freq = $segmntedPacOne[5];
+  
+
 
   // Byte_06 Description
   if ($segmntedPacOne[6] == 0) {
@@ -203,7 +209,7 @@
   
   // Byte_33 Description
   $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
-  //echo "<pre>";print_r($Compressor);echo "</pre>";
+  //echo "<pre>";print_r($segmntedPacOne[5]);echo "</pre>";
 
   $version = "20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36];
 
@@ -342,7 +348,7 @@
                         <div class="row">
                           <div class="col-9">
                             <div class="d-flex align-items-center align-self-start">
-                              <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[4]);?></h3>
+                              <h3 class="mb-0"><?php echo ("F".$targ_Freq);?></h3>
                               <p class="text-success ml-2 mb-0 font-weight-medium"></p>
                             </div>
                           </div>                          
@@ -359,7 +365,7 @@
                         <div class="row">
                           <div class="col-9">
                             <div class="d-flex align-items-center align-self-start">
-                              <h3 class="mb-0"><?php echo ("F".$segmntedPacOne[5]);?></h3>
+                              <h3 class="mb-0"><?php echo ("F".$Set_Freq);?></h3>
                               <p class="text-success ml-2 mb-0 font-weight-medium"></p>
                             </div>
                           </div>                          
@@ -376,12 +382,12 @@
                         <div class="row">
                           <div class="col-9">
                             <div class="d-flex align-items-left align-self-start">
-                              <h3 class="mb-0"><?php echo ($segmntedPacOne[3]);?></h3>
+                              <h3 class="mb-0"><?php echo ($Real_Freq);?></h3>
                               <p class="text-danger ml-2 mb-0 font-weight-medium">Hz</p>
                             </div>
 
                             <div class="d-flex align-items-left align-self-start">
-                              <h3 class="mb-0"><?php echo (" ".$segmntedPacOne[3]*60);?></h3>
+                              <h3 class="mb-0"><?php echo (" ".$Real_Freq_RPM);?></h3>
                               <p class="text-danger ml-2 mb-0 font-weight-medium">rpm</p>
                             </div>
                           </div>                          

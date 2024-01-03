@@ -307,23 +307,18 @@
   <script type="text/javascript">
     const countdownEl = document.querySelector(".countdown");
     const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 240; // seconds
+    let remainingTime = 320; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 230){
+        if(remainingTime == 280){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 220){
-          EE_segMent++;
-          console.log("BAL:"+EE_segMent);
-          updateEESeg(EE_segMent);
-        }
-        if(remainingTime == 210){
+        if(remainingTime == 240){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
@@ -333,27 +328,26 @@
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 190){
-          EE_segMent++;
-          console.log(EE_segMent);
-          updateEESeg(EE_segMent);
-        }
-        if(remainingTime == 180){
-          EE_segMent++;
-          console.log(EE_segMent);
-          updateEESeg(EE_segMent);
-        }
-        if(remainingTime == 170){
-          EE_segMent++;
-          console.log(EE_segMent);
-          updateEESeg(EE_segMent);
-        }
         if(remainingTime == 160){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-
+        if(remainingTime == 120){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 80){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
+        if(remainingTime == 40){
+          EE_segMent++;
+          console.log(EE_segMent);
+          updateEESeg(EE_segMent);
+        }
         if(remainingTime == 2){
           EE_segMent++;
           console.log(EE_segMent);

@@ -61,7 +61,7 @@ if($Segment == '6'){
 if($Segment == '7'){
   $ee_seg = $EE_Data[1]['segMnt_Eight'];
 }
-if($Segment == '4'){
+if($Segment == '8'){
   $ee_seg = "";
 }
 //   echo "<pre>";
