@@ -61,16 +61,17 @@
       //print_r($result);
       $Packet_One = $row['serial_pac_one'];
       $Packet_Two = $row['serial_pac_two'];
+      $Packet_Three= $row['idu_ee'];
       $Log_Time   = $row['modified'];
     }
     //echo $Log_Time;
   } else {
     //echo "No data Found";
-
+//1;01608984560;;170,16,1,0,0,0,0,0,0,110,110,102,53,102,106,124,2,0,0,5,169,0,0,50,9,180,33,0,0,1,1,110,3,116,23,5,11,162,;187,2,0,0,0,1,180,0,0,0,110,102,53,102,107,124,2,0,0,5,170,0,0,50,9,180,33,0,0,1,1,110,3,116,23,5,11,220,;170,20,75,83,78,49,51,51,68,50,49,85,70,90,35,35,35,35,42,42,42,42,42,42,42,42,0,0,0,0,86,250,0,0,0,177,205,221,;0;;
   }
   $conn->close();
 
-  //print_r($result);
+
   
   if ($Packet_One == NULL) {
     $segmntedPacOne =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
@@ -222,11 +223,22 @@
     $segmntedPacOne =  explode(",", $Packet_Two) ; 
   }
   $FAN_IPM = $segmntedPacTwo[7];
-  $IDU_FAULT= IduFaultDetection($segmntedPacTwo[8]);
+  $IDU_FAULT= "*******";//IduFaultDetection($segmntedPacTwo[8]);
 
 
-
-
+  /************ Packet Three Data Acqusition *********/
+  //print_r($Packet_Three);
+  $Pac_3_Data = explode(",",$Packet_Three);
+  $compModelName = "";
+  for ($i=2; $i < 18; $i++) { 
+    $compModelName .=chr($Pac_3_Data[$i]);
+  }
+  $ODU_EE_CheckSum  = "0x".strtoupper(dechex($Pac_3_Data[30]).dechex($Pac_3_Data[31]));
+  $ODU_MCU_CheckSum = "0x".strtoupper(dechex($Pac_3_Data[28]).dechex($Pac_3_Data[29]));
+  $IDU_EE_CheckSum  = "0x".strtoupper(dechex($Pac_3_Data[35]).dechex($Pac_3_Data[36]));
+  $IDU_MCU_CheckSum = "0x".strtoupper(dechex($Pac_3_Data[32]).dechex($Pac_3_Data[33]).dechex($Pac_3_Data[34]));
+  
+  
   ?>
 
   <div class="container-scroller">
@@ -327,7 +339,7 @@
 
                   <div class="col-5 col-sm-7 col-xl-8 p-0">
                     <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
-                    <h4 class="mb-1 mb-sm-0">Version Date: <?php echo ($version); ?></h4>
+                    <h4 class="mb-1 mb-sm-0">Soft Data: <?php echo ($version); ?></h4>
                     <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
                     <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
                   </div>
@@ -397,7 +409,7 @@
                     </div>
                   </div>  
 
-                  <div class="col-xl-8 col-sm-6 grid-margin stretch-card">
+                  <div class="col-xl-6 col-sm-6 grid-margin stretch-card">
                     <div class="card">
                       <div class="card-body">
                         <h5 class="text-muted font-weight-normal">ERROR Code</h5>
@@ -405,6 +417,23 @@
                           <div class="col-9">
                             <div class="d-flex align-items-center align-self-start">
                               <h3 class="mb-0"><?php echo $ERRcode;?></h3>
+                              <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                          </div>                          
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-xl-6 col-sm-6 grid-margin stretch-card">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="text-muted font-weight-normal">Compressor Model</h5>
+                        <div class="row">
+                          <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                              <h3 class="mb-0"><?php echo ($compModelName);?></h3>
                               <p class="text-success ml-2 mb-0 font-weight-medium"></p>
                             </div>
                           </div>                          
@@ -536,6 +565,7 @@
                 <div class="template-demo">
                   <h1 class="display-5">Mode: <?php echo $Mode;?></h1>
                   <h1 class="display-5">Rated Mode: <?php echo $RatedModeLowNibble;?></h1>
+                  <h1 class="display-5">MCU Checksum: <?php echo $IDU_MCU_CheckSum;?></h1>
                 </div>
               </div>
             </div>
@@ -544,6 +574,7 @@
                 <div class="template-demo">
                   <h1 class="display-5">Tr: <?php echo $Tr."°C";?></h1>
                   <h1 class="display-5">Ts: <?php echo $Ts."°C";?></h1>
+                  <h1 class="display-5">EE Checksum: <?php echo $IDU_EE_CheckSum;?></h1>
                 </div>
               </div>
             </div>
@@ -588,11 +619,11 @@
                   <h3 class="display-5">Fan rpm: <?php echo $ODU_Fan_Speed;?></h3>
                   <h3 class="display-5">Drv Fault : <?php echo "------";?></h3>
                   <h3 class="display-5">EEV : <?php echo "------";?></h3>
-                  <h3 class="display-5">Comp Type : <?php echo "------";?></h3>
-                  <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
+                  
                 </div>
               </div>
             </div>
+
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
@@ -601,10 +632,11 @@
                   <h3 class="display-5">Tc: <?php echo (($segmntedPacOne[14]-60)/2)."°C";?></h3>
                   <h3 class="display-5">Td : <?php echo ($segmntedPacOne[12]-30)."°C";?></h3>
                   <h3 class="display-5">Tipm : <?php echo ($segmntedPacOne[26])."°C";?></h3>
-                  <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
+                  
                 </div>
               </div>
             </div>
+
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
@@ -613,7 +645,20 @@
                   <h3 class="display-5">AC CUR: <?php echo ($segmntedPacOne[16]/10);?></h3>
                   <h3 class="display-5">AC VOL : <?php echo ($segmntedPacOne[15]*2);?></h3>
                   <h3 class="display-5">Off Time : <?php echo "------";?></h3>
-                  <h3 class="display-5">System Type : <?php echo "------";?></h3>
+                  
+                  
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 grid-margin stretch-card">
+              <div class="card-body">
+                <div class="template-demo">
+                  <h3 class="display-5">Comp Type : <?php echo "------";?></h3>
+                  <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
+                  <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
+                  <h1 class="display-5">MCU Checksum: <?php echo $ODU_MCU_CheckSum;?></h1>
+                  <h1 class="display-5">EE Checksum: <?php echo $ODU_EE_CheckSum;?></h1>                  
                 </div>
               </div>
             </div>

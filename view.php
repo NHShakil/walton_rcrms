@@ -22,6 +22,7 @@
   $dbname = "ee_monitoring";
 
   $navDevList = array();
+  $lstConnTime = array();
   $conn = new mysqli($servername, $username, $password, $dbname);
 
   if ($conn->connect_error) {
@@ -31,16 +32,46 @@
   $sql = "SELECT * FROM `live_device` WHERE `status`='1';";
   $conectDevList = $conn->query($sql);
 
+  $sql = "SELECT * FROM `live_device` WHERE `mob_no`='".$mobileNo."';";
+  $targetDev = $conn->query($sql);
+  print_r($targetDev);
+
   if ($conectDevList->num_rows > 0) {
     while($row = $conectDevList->fetch_assoc()) {
-
       array_push( $navDevList,$row);
     }
   } else {
     echo "0 results";
   }
+
+  if ($targetDev->num_rows > 0) {
+    while($row = $targetDev->fetch_assoc()) {
+      $lstDateTime = explode(" ", $row['modified']);
+      //print_r($row['modified']);
+      //print_r(explode(" ", $row['modified']));
+    }
+  } else {
+    echo "0 results";
+  }
+
   $conn->close();
+
+
+
+  // $now    = date();
+  // $target = strtotime($lastTime);
+  // $diff   = abs($now - $target);
+  // echo "<br>".$diff."--";
+  // if ($diff < 15000) {
+  //   print("CONN");
+  // }
+  // else{
+  //   print("NCON");
+  // }
+
+  echo date("Y-m-d");
   ?>
+
 
   <div class="container-scroller">
     <!-- partial:./partials/_sidebar.html -->
