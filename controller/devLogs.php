@@ -117,18 +117,14 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 
 		// Read IDU CheckSUm
 		else if($opCMD == 4){
-			$EE_Data .= "RIC,4";
+			$EE_Data .= "RIC,4,";
 		}
 		// Read ODU CheckSUm
 		else if($opCMD == 5){
-			$EE_Data .= "ROC,5";
-		}
-		// Compressor Model No Read
-		else if($opCMD == 6){
-			$EE_Data .= "CMN,5";
-		}
+			$EE_Data .= "ROC,5,";
+		}	
 		else{
-			$EE_Data .= "SRV,0";
+			$EE_Data .= "SRV,0,";
 		}
 
 		print_r($EE_Data);

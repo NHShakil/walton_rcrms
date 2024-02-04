@@ -4,7 +4,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Corona Admin</title>
+  <title>Air Conditoner (RAC)</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="./assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="./assets/vendors/css/vendor.bundle.base.css">
@@ -210,7 +210,7 @@
 
                   <h4 class="card-title">EE Program Uploading Status</h4>
                   <div class="table-responsive div-scroll" >
-                    <table class="table table-bordered table-contextual" >
+                    <!-- <table class="table table-bordered table-contextual" >
 
                       <thead>
                         <tr>
@@ -257,7 +257,7 @@
                         </tr>
 
                       </tbody>
-                    </table>
+                    </table> -->
                   </div>
                 </div>
               </div>              

@@ -4,7 +4,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Corona Admin</title>
+  <title>Air Conditoner (RAC)</title>
 
   <link rel="stylesheet" href="./assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="./assets/vendors/css/vendor.bundle.base.css">
@@ -34,7 +34,7 @@
 
   $sql = "SELECT * FROM `live_device` WHERE `mob_no`='".$mobileNo."';";
   $targetDev = $conn->query($sql);
-  print_r($targetDev);
+  //print_r($targetDev);
 
   if ($conectDevList->num_rows > 0) {
     while($row = $conectDevList->fetch_assoc()) {
@@ -69,7 +69,7 @@
   //   print("NCON");
   // }
 
-  echo date("Y-m-d");
+  //echo date("Y-m-d");
   ?>
 
 

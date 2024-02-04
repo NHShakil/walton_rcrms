@@ -21,8 +21,7 @@ $password = "";
 $dbname = "ee_monitoring";
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+  die("Connection failed: " . $conn->connect_errordd}
 
 $sql = "SELECT * FROM `ee_program_list_odu` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."';";
 //echo $sql;

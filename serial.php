@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="refresh" content="5">
-  <title>Corona Admin</title>
+  <title>Air Conditoner (RAC)</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="./assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="./assets/vendors/css/vendor.bundle.base.css">
@@ -338,9 +338,9 @@
                 <div class="row align-items-center">
 
                   <div class="col-5 col-sm-7 col-xl-8 p-0">
-                    <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4> 
+                    <!-- <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4>  -->
                     <h4 class="mb-1 mb-sm-0">Soft Data: <?php echo ($version); ?></h4>
-                    <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4>
+                    <!-- <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4> -->
                     <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
                   </div>
                 </div>
@@ -654,7 +654,7 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h3 class="display-5">Comp Type : <?php echo "------";?></h3>
+                  <h3 class="display-5">Comp Type : <?php echo $segmntedPacOne[23];?></h3>
                   <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
                   <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
                   <h1 class="display-5">MCU Checksum: <?php echo $ODU_MCU_CheckSum;?></h1>
