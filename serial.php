@@ -80,10 +80,13 @@
     $segmntedPacOne =  explode(",", $Packet_One) ; 
   }
   
-  //$segmntedPacOne = ;
-
-  $Packet_Two = rtrim($Packet_Two, ",");
-  $segmntedPacTwo = explode(",", $Packet_Two);
+  
+  if ($Packet_Two == NULL) {
+    $segmntedPacTwo =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
+  }else{
+    $Packet_Two = rtrim($Packet_Two, ",");
+    $segmntedPacTwo = explode(",", $Packet_Two);
+  }
 
   //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
   //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
@@ -228,7 +231,14 @@
 
   /************ Packet Three Data Acqusition *********/
   //print_r($Packet_Three);
-  $Pac_3_Data = explode(",",$Packet_Three);
+  if ($Packet_Three == NULL) {
+    $Pac_3_Data =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
+  }else{
+    $Pac_3_Data = rtrim($Packet_Three, ",");
+    $Pac_3_Data = explode(",",$Packet_Three);
+  }
+
+  
   $compModelName = "";
   for ($i=2; $i < 18; $i++) { 
     $compModelName .=chr($Pac_3_Data[$i]);
