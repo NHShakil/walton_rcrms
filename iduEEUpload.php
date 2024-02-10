@@ -63,14 +63,15 @@
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
       array_push( $devList,$row);
-      //$created = $row['created'];
-      //$modified = $row['modified'];
+      $created = $row['created'];
+      $modified = $row['modified'];
     }
   } else {
       //echo "0";
   }
 
   $conn->close();
+  //print_r($created);
   
 
   $navDevList = array();
@@ -89,17 +90,17 @@
 
   if ($conectDevList->num_rows > 0) {
     while($row = $conectDevList->fetch_assoc()) {
-
       array_push( $navDevList,$row);
     }
   } else {
     echo "0 results";
   }
   $conn->close();
-    //print_r($devList);
+
   $segOne = explode(",", $devList[0]["segMnt_one"]);
   $segTwo = explode(",", $devList[0]["segMnt_Two"]);
   $checkSum = $devList[0]['checksum'];
+  //print_r($segOne);
   ?>
   <div class="container-scroller">
     <!-- partial:./partials/_sidebar.html -->
@@ -198,19 +199,13 @@
             <div class="col-md-6 grid-margin stretch-card" style="overflow-x:auto;">
               <div class="card">
                 <div class="card-body">
-
-
-
-
                   <div class="progress-bar">
                     <div class="progress"></div>
                   </div>
-
                   <span class="countdown"></span>
-
                   <h4 class="card-title">EE Program Uploading Status</h4>
                   <div class="table-responsive div-scroll" >
-                    <!-- <table class="table table-bordered table-contextual" >
+                    <table class="table table-bordered table-contextual" >
 
                       <thead>
                         <tr>
@@ -223,41 +218,40 @@
                       <tbody>
 
                         <?php 
-                        $add = 0;
-                        foreach ($segOne as $key => $value) {
+                        array_pop($segOne);array_pop($segTwo);
+                        array_shift($segOne);array_shift($segOne);array_shift($segOne);
+                        array_shift($segTwo);array_shift($segTwo);array_shift($segTwo);
 
+                        $add = 0;                        
+                        foreach ($segOne as $key => $value) {
                           echo "<tr class=\"table-danger\">
                           <td> ".$add." </td>
                           <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> 0 </td>
+                          <td id=\"add-".$key."\"> FF </td>
                           <td> FAULT </td>
                           </tr>";
                           $add++;
                         }
 
-                        foreach ($segTwo as $key => $value) {
-
+                        foreach ($segTwo as $key => $value) {                          
                           echo "<tr class=\"table-danger\">
                           <td> ".$add." </td>
                           <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> 0 </td>
+                          <td id=\"add-".$key."\"> FF </td>
                           <td> FAULT </td>
                           </tr>";
                           $add++;
                         }
 
                         ?>
-
-
                         <tr class="table-success">
                           <td> 128 </td>
                           <td> Test </td>
                           <td> Test </td>
                           <td> OK </td>
                         </tr>
-
                       </tbody>
-                    </table> -->
+                    </table>
                   </div>
                 </div>
               </div>              
@@ -269,8 +263,8 @@
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
                 <div class="text-md-center text-xl-left">
                   <h6 class="mb-1">Actual EE Check Sum</h6>
-                  <p class="text-muted mb-0">Created  : <?echo $crjeated;?></p>
-                  <p class="text-muted mb-0">Modified : <?echo $modified;?></p>
+                  <p class="text-muted mb-0">Created  : <?php echo $created;?></p>
+                  <p class="text-muted mb-0">Modified : <?php echo $modified;?></p>
                 </div>
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <h6 class="font-weight-bold mb-0">0x<?php echo $checkSum;?></h6>
@@ -283,13 +277,16 @@
                 </div>
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <h6 class="font-weight-bold mb-0">0XXXXX</h6>
-                </div>
+                </div>                
+              </div>
+
+              <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
+                
+                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                  <button id="checkButton" type="button" class="btn btn-success btn-rounded btn-fw not-visible" onclick="checkEE()" >Success</button>
+                </div>                
               </div>
             </div>
-
-
-
-
           </div>
 
           <footer class="footer">
@@ -372,6 +369,37 @@
       });
     }
     
+  </script>
+  <script type="text/javascript">
+    function checkEE(){
+      console.log("TEST");
+
+      $.ajax({
+        type: 'POST',
+        url:  'controller/idu_ee_check.php/',
+        data: { 
+          type:"<?php echo $Type;?>",
+          capacity:"<?php echo $Capacity;?>",
+          version:"<?php echo $Version;?>",
+          Model:"<?php echo $Model;?>",
+          MobNo:"<?php echo $MobNo;?>"
+        }
+      })
+      .done( function (version) {
+
+
+      })   
+      .fail( function (jqXHR, status, error) {
+        alert("Fail;")
+      })
+      .always( function() {
+        $('p:first').after('<p>Thank you.</p>');
+      });
+
+    }
+    
+
+
   </script>
   <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
 

@@ -25,7 +25,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "SELECT * FROM `ee_program_list` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."';";
-echo $sql;
+//echo $sql;
 $result  = $conn->query($sql);
 
 if ($result->num_rows > 0) {

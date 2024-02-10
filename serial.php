@@ -142,21 +142,17 @@
     $Limit   = LimitByteChecker($segmntedPacOne[8],$Alarm_clr);
   }
 
-  // Byte_09 Description
-  $Ts = ($segmntedPacOne[9]-60)/2;
-  // Byte_10 Description
-  $Tr = ($segmntedPacOne[10]-60)/2;
-  // Byte_13 Description
-  $Te = ($segmntedPacOne[13]-60)/2;
-  $AC_Volt = $segmntedPacOne[15]*2;
-  $AC_Curnt = $segmntedPacOne[16]/10;
 
-
-
+  $Ts      = ($segmntedPacOne[9]-60)/2;
+  $Tr      = ($segmntedPacOne[10]-60)/2;
+  $Ta      = ($segmntedPacOne[11]-60)/2;
+  $Td      =  $segmntedPacOne[12]-30;
+  $Te      = ($segmntedPacOne[13]-60)/2;
+  $Tc      = ($segmntedPacOne[14]-60)/2;
+  $AC_VOLT = ($segmntedPacOne[15]*2);
+  $AC_CRNT = ($segmntedPacOne[16]/10);
   // Byte_17 Description
   $ERRcode = ERRCodeDetection($segmntedPacOne[17]);
-  
-
   // Byte_18 Description
   if(($segmntedPacOne[18])==0){
     //print_r("FUCk.....");
@@ -178,16 +174,16 @@
   }
   // Byte_19 Description
   // Indoor FAN Wind Speed Level
-  $Byte_19 = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
-  $IDU_Fan_Speed = $Byte_19[$segmntedPacOne[19]];
+  $Byte_19      = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
+  $IDU_Fan_Speed= $Byte_19[$segmntedPacOne[19]];
+  $DC_VOLT      = ($segmntedPacOne[20]*2);
+  $DC_CRNT      = ($segmntedPacOne[21]/10);
+  $ODU_Fan_Speed= $segmntedPacOne[22]*10;
+  $comp_type    = $segmntedPacOne[23];
+  $Byte_24      = array("A","B","C","D","E","F","G","H","I","J");
+  $Tipm         = $segmntedPacOne[26];
 
-  $DC_Volt = $segmntedPacOne[20]*2;
-  $DC_Curnt = $segmntedPacOne[21]/10;
-  $ODU_Fan_Speed = $segmntedPacOne[22]*10;
-
-
-
-
+  
   // Byte_27 Description
   $Byte_27    = array("Permanent stop sign","IDU failure","mould proof","ECO mode","PFC open");
   $FreqAlarms2= array_reverse(str_split(sprintf('%08b',  $segmntedPacOne[27]),1));
@@ -197,7 +193,6 @@
   $ECOMode    = ($FreqAlarms2[3] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   $PFC        = ($FreqAlarms2[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   
-
 
   // Byte_28 Description
   if ($segmntedPacOne[28] == 0) {
@@ -528,7 +523,7 @@
                           <td>Preheater</td>
                           <td><button type="button" class="btn btn-<?php echo $PreHeat;?> btn-rounded btn-icon">
                           </button></td>
-                          <td>Collect F</td>
+                          <td>Turbo</td>
                           <td><button type="button" class="btn btn-<?php //echo $Compressor;?> btn-rounded btn-icon">
                           </button></td>                          
                         </tr>
@@ -638,10 +633,10 @@
               <div class="card-body">
                 <div class="template-demo">
                   <h3 class="display-5">Tsu: <?php echo "----";?></h3>
-                  <h3 class="display-5">Ta: <?php echo (($segmntedPacOne[11]-60)/2)."°C";?></h3>
-                  <h3 class="display-5">Tc: <?php echo (($segmntedPacOne[14]-60)/2)."°C";?></h3>
-                  <h3 class="display-5">Td : <?php echo ($segmntedPacOne[12]-30)."°C";?></h3>
-                  <h3 class="display-5">Tipm : <?php echo ($segmntedPacOne[26])."°C";?></h3>
+                  <h3 class="display-5">Ta: <?php echo $Ta."°C";?></h3>
+                  <h3 class="display-5">Tc: <?php echo $Tc."°C";?></h3>
+                  <h3 class="display-5">Td : <?php echo $Td."°C";?></h3>
+                  <h3 class="display-5">Tipm : <?php echo $Tipm."°C";?></h3>
                   
                 </div>
               </div>
@@ -650,10 +645,10 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h3 class="display-5">DC CUR: <?php echo ($segmntedPacOne[21]/10);?></h3>
-                  <h3 class="display-5">DC VOL: <?php echo ($segmntedPacOne[20]*2);?></h3>
-                  <h3 class="display-5">AC CUR: <?php echo ($segmntedPacOne[16]/10);?></h3>
-                  <h3 class="display-5">AC VOL : <?php echo ($segmntedPacOne[15]*2);?></h3>
+                  <h3 class="display-5">DC CUR: <?php echo $DC_CRNT;?></h3>
+                  <h3 class="display-5">DC VOL: <?php echo $DC_VOLT;?></h3>
+                  <h3 class="display-5">AC CUR: <?php echo $AC_CRNT;?></h3>
+                  <h3 class="display-5">AC VOL : <?php echo $AC_VOLT;?></h3>
                   <h3 class="display-5">Off Time : <?php echo "------";?></h3>
                   
                   
@@ -664,7 +659,7 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h3 class="display-5">Comp Type : <?php echo $segmntedPacOne[23];?></h3>
+                  <h3 class="display-5">Comp Type : <?php echo $comp_type ;?></h3>
                   <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
                   <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
                   <h1 class="display-5">MCU Checksum: <?php echo $ODU_MCU_CheckSum;?></h1>
