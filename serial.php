@@ -220,6 +220,7 @@
     $Packet_Two = rtrim($Packet_Two, ",");
     $segmntedPacOne =  explode(",", $Packet_Two) ; 
   }
+  $Time_STS = On_Off_FLG_Detect ($segmntedPacTwo[4]);
   $FAN_IPM = $segmntedPacTwo[7];
   $IDU_FAULT= "*******";//IduFaultDetection($segmntedPacTwo[8]);
 
