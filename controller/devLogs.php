@@ -87,8 +87,6 @@ $sql = "INSERT INTO `log` (`id`, `mob_no`, `data`, `created`, `modified`) VALUES
 
 		}
 		
-
-		
 		$sql = "SELECT * FROM `live_device` WHERE `mob_no`='".$pram[1]."';";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {

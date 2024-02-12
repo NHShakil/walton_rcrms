@@ -290,9 +290,9 @@ function ODUTypeChecker($DataVal)
 
 function On_Off_FLG_Detect ($DataVal)
 {
-	echo $DataVal;
+	//echo $DataVal;
 	$Bits = array_reverse(str_split(sprintf('%08b',  $DataVal),1));
-	echo "<pre>";print_r($Bits[0]);echo "</pre>";
+	//echo "<pre>";print_r($Bits[0]);echo "</pre>";
 	return $sts = ($Bits[0] == 1) ? "ON" : "OFF" ;
 }
 

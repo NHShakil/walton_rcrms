@@ -44,7 +44,6 @@
 
   if ($conectDevList->num_rows > 0) {
     while($row = $conectDevList->fetch_assoc()) {
-
       array_push( $navDevList,$row);
     }
   } else {
@@ -61,10 +60,9 @@
       //print_r($result);
       $Packet_One = $row['serial_pac_one'];
       $Packet_Two = $row['serial_pac_two'];
-      $Packet_Three= $row['idu_ee'];
+      $Packet_Three= $row['serial_pac_three'];
       $Log_Time   = $row['modified'];
     }
-    //echo $Log_Time;
   } else {
     //echo "No data Found";
 //1;01608984560;;170,16,1,0,0,0,0,0,0,110,110,102,53,102,106,124,2,0,0,5,169,0,0,50,9,180,33,0,0,1,1,110,3,116,23,5,11,162,;187,2,0,0,0,1,180,0,0,0,110,102,53,102,107,124,2,0,0,5,170,0,0,50,9,180,33,0,0,1,1,110,3,116,23,5,11,220,;170,20,75,83,78,49,51,51,68,50,49,85,70,90,35,35,35,35,42,42,42,42,42,42,42,42,0,0,0,0,86,250,0,0,0,177,205,221,;0;;
@@ -89,8 +87,6 @@
   }
 
   //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
-  //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
-
 
   $Alarm_clr = array(
     "outline-secondary", // Blank
@@ -200,7 +196,7 @@
     array_push($DownFreq,"OK",$Alarm_clr[2]);
   }else{
     $DownFreq   = DownFreqByteChecker($segmntedPacOne[28],$Alarm_clr);
-  }//echo "<pre>";print_r($DownFreq);echo "</pre>";
+  }
 
   // Byte_32 Description
   $RatedModeLowNibble = modeDetection($segmntedPacOne[32]);
@@ -208,7 +204,7 @@
   
   // Byte_33 Description
   $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
-  //echo "<pre>";print_r($segmntedPacOne[5]);echo "</pre>";
+  
 
   $version = "20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36];
 
@@ -343,10 +339,8 @@
               <div class="card-body py-0 px-0 px-sm-3">
                 <div class="row align-items-center">
 
-                  <div class="col-5 col-sm-7 col-xl-8 p-0">
-                    <!-- <h4 class="mb-1 mb-sm-0">Version : <?php echo ($segmntedPacOne[23]);?></h4>  -->
-                    <h4 class="mb-1 mb-sm-0">Soft Data: <?php echo ($version); ?></h4>
-                    <!-- <h4 class="mb-1 mb-sm-0">System Type : <?php echo ("Machine Type ".$segmntedPacOne[23]) ?></h4> -->
+                  <div class="col-5 col-sm-7 col-xl-8 p-0">                   
+                    <h4 class="mb-1 mb-sm-0">Soft Data: <?php echo ($version); ?></h4>                   
                     <h4 class="mb-1 mb-sm-0">Last Updated Time &nbsp;: <?php echo ($Log_Time) ?></h4>
                   </div>
                 </div>
@@ -358,7 +352,6 @@
               <div class="card-body">
                 <br>
                 <div class="row">
-
                   <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
                     <div class="card">
                       <div class="card-body">
@@ -371,7 +364,6 @@
                             </div>
                           </div>                          
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -388,7 +380,6 @@
                             </div>
                           </div>                          
                         </div>
-
                       </div>
                     </div>
                   </div>
