@@ -218,30 +218,30 @@
                       <tbody>
 
                         <?php 
-                        array_pop($segOne);array_pop($segTwo);
-                        array_shift($segOne);array_shift($segOne);array_shift($segOne);
-                        array_shift($segTwo);array_shift($segTwo);array_shift($segTwo);
+                        // array_pop($segOne);array_pop($segTwo);
+                        // array_shift($segOne);array_shift($segOne);array_shift($segOne);
+                        // array_shift($segTwo);array_shift($segTwo);array_shift($segTwo);
 
-                        $add = 0;                        
-                        foreach ($segOne as $key => $value) {
-                          echo "<tr class=\"table-danger\">
-                          <td> ".$add." </td>
-                          <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> FF </td>
-                          <td> FAULT </td>
-                          </tr>";
-                          $add++;
-                        }
+                        // $add = 0;                        
+                        // foreach ($segOne as $key => $value) {
+                        //   echo "<tr class=\"table-danger\">
+                        //   <td> ".$add." </td>
+                        //   <td> ".$value." </td>
+                        //   <td id=\"add-".$key."\"> FF </td>
+                        //   <td> FAULT </td>
+                        //   </tr>";
+                        //   $add++;
+                        // }
 
-                        foreach ($segTwo as $key => $value) {                          
-                          echo "<tr class=\"table-danger\">
-                          <td> ".$add." </td>
-                          <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> FF </td>
-                          <td> FAULT </td>
-                          </tr>";
-                          $add++;
-                        }
+                        // foreach ($segTwo as $key => $value) {                          
+                        //   echo "<tr class=\"table-danger\">
+                        //   <td> ".$add." </td>
+                        //   <td> ".$value." </td>
+                        //   <td id=\"add-".$key."\"> FF </td>
+                        //   <td> FAULT </td>
+                        //   </tr>";
+                        //   $add++;
+                        // }
 
                         ?>
                         <tr class="table-success">
@@ -277,55 +277,58 @@
                 </div>
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <h6 class="font-weight-bold mb-0">0XXXXX</h6>
-                </div>                
+                </div>
               </div>
-
-              <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                
+              <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">                  
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                  <button id="checkButton" type="button" class="btn btn-success btn-rounded btn-fw not-visible" onclick="checkEE()" >Success</button>
+                  <button id="checkButton" type="button" class="btn btn-success btn-rounded btn-fw not-visible" onclick="checkEE()" disabled >Check EE Version</button>
                 </div>                
-              </div>
+              </div> 
+
+              
             </div>
           </div>
-
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Product of <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank"> Residential Air Conditoner</a> Research & Innovation</span>
-            </div>
-          </footer>
-
         </div>
+
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Product of <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank"> Residential Air Conditoner</a> Research & Innovation</span>
+          </div>
+        </footer>
+
       </div>
     </div>
-  </body>
-  <script src="js/jquery-1.11.2.min.js"></script>
-  <script type="text/javascript">
-    const countdownEl = document.querySelector(".countdown");
-    const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 160; // seconds
+  </div>
+</body>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+  const countdownEl = document.querySelector(".countdown");
+  const progressBarEl = document.querySelector(".progress");
+    let remainingTime = 165; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 120){
-          EE_segMent++;
+        if(remainingTime == 125){
+          EE_segMent++;          
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 80){
+        if(remainingTime == 85){
           EE_segMent++;
           console.log("BAL:"+EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 40){
+        if(remainingTime == 45){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 2){
+        if(remainingTime == 5){
+          $('#checkButton').prop('disabled', false);
+          updateEESeg();
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
@@ -337,6 +340,7 @@
         remainingTime--;
         setTimeout(countdown, 1000);
       } else {
+        
         progressBarEl.style.width = "100%";
         countdownEl.textContent = "Time's up!";
       }
@@ -347,7 +351,7 @@
     function updateEESeg(argument) {
       $.ajax({
         type: 'POST',
-        url:  'controller/checkSumUpdater.php/',
+        url:  'controller/idu_ee_check.php/?',
         data: { 
           type:"<?php echo $Type;?>",
           capacity:"<?php echo $Capacity;?>",
@@ -358,7 +362,6 @@
         }
       })
       .done( function (version) {
-
 
       })   
       .fail( function (jqXHR, status, error) {
