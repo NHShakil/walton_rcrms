@@ -20,6 +20,8 @@
   $username = "root";
   $password = "";
   $dbname = "ee_monitoring";
+  $IDU_EE_PRT_FLG = 1;
+  $ODU_EE_PRT_FLG = 1;
 
   $navDevList = array();
   $lstConnTime = array();

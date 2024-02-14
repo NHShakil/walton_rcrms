@@ -16,7 +16,7 @@
   <!-- Layout styles -->
   <link rel="stylesheet" href="./assets/css/style.css">
   <!-- End layout styles -->
-  <link rel="shortcut icon" href="./assets/images/favicon.png" />
+  <link rel="shortcut icon" href="./assets/images/favicon.png" />  
   <style>
     .progress-bar {
       width: auto;
@@ -35,7 +35,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="unsetButton()">
   <?php
   $Type = $_POST['type'];
   $Capacity = $_POST['capacity'];
@@ -205,53 +205,8 @@
                   <span class="countdown"></span>
                   <h4 class="card-title">EE Program Uploading Status</h4>
                   <div class="table-responsive div-scroll" >
-                    <table class="table table-bordered table-contextual" >
-
-                      <thead>
-                        <tr>
-                          <th> Add No.</th>
-                          <th> File Data</th>
-                          <th> Device Data </th>
-                          <th> Remarks </th>                            
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                        <?php 
-                        // array_pop($segOne);array_pop($segTwo);
-                        // array_shift($segOne);array_shift($segOne);array_shift($segOne);
-                        // array_shift($segTwo);array_shift($segTwo);array_shift($segTwo);
-
-                        // $add = 0;                        
-                        // foreach ($segOne as $key => $value) {
-                        //   echo "<tr class=\"table-danger\">
-                        //   <td> ".$add." </td>
-                        //   <td> ".$value." </td>
-                        //   <td id=\"add-".$key."\"> FF </td>
-                        //   <td> FAULT </td>
-                        //   </tr>";
-                        //   $add++;
-                        // }
-
-                        // foreach ($segTwo as $key => $value) {                          
-                        //   echo "<tr class=\"table-danger\">
-                        //   <td> ".$add." </td>
-                        //   <td> ".$value." </td>
-                        //   <td id=\"add-".$key."\"> FF </td>
-                        //   <td> FAULT </td>
-                        //   </tr>";
-                        //   $add++;
-                        // }
-
-                        ?>
-                        <tr class="table-success">
-                          <td> 128 </td>
-                          <td> Test </td>
-                          <td> Test </td>
-                          <td> OK </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <h1 id="status" class="card-body">
+                    </h1>
                   </div>
                 </div>
               </div>              
@@ -267,7 +222,7 @@
                   <p class="text-muted mb-0">Modified : <?php echo $modified;?></p>
                 </div>
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                  <h6 class="font-weight-bold mb-0">0x<?php echo $checkSum;?></h6>
+                  <h6 id="EE_CHK_SUM" class="font-weight-bold mb-0">0x<?php echo $checkSum;?></h6>
                 </div>
               </div>
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
@@ -275,17 +230,20 @@
                   <h6 class="mb-1">Device EE Check Sum</h6>
                   <p class="text-muted mb-0">XX XXX XXXX, XX:XX XX</p>
                 </div>
-                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                  <h6 class="font-weight-bold mb-0">0XXXXX</h6>
+                <div id="deviceChecksum" class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                  <h6  class="font-weight-bold mb-0">0XXXXX</h6>
                 </div>
               </div>
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">                  
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <button id="checkButton" type="button" class="btn btn-success btn-rounded btn-fw not-visible" onclick="checkEE()" disabled >Check EE Version</button>
-                </div>                
+                </div>     
+                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                  <button id="crossMatchButton" type="button" class="btn btn-danger btn-rounded btn-fw not-visible" onclick="crossCheckEE()" disabled >Cross Match</button>
+                </div>           
               </div> 
 
-              
+
             </div>
           </div>
         </div>
@@ -301,6 +259,12 @@
     </div>
   </div>
 </body>
+<script>
+  function unsetButton() {
+    $('#checkButton').prop('disabled', false);
+    $('#crossMatchButton').prop('disabled', false);
+  }
+</script>
 <script src="js/jquery-1.11.2.min.js"></script>
 <script type="text/javascript">
   const countdownEl = document.querySelector(".countdown");
@@ -340,7 +304,7 @@
         remainingTime--;
         setTimeout(countdown, 1000);
       } else {
-        
+
         progressBarEl.style.width = "100%";
         countdownEl.textContent = "Time's up!";
       }
@@ -368,7 +332,7 @@
         alert("Fail;")
       })
       .always( function() {
-        $('p:first').after('<p>Thank you.</p>');
+
       });
     }
     
@@ -401,8 +365,47 @@
 
     }
     
+    function crossCheckEE(argument) {
+      console.log("TEST");
+
+      $.ajax({
+        type: 'POST',
+        url:  'controller/crossCheck.php/',
+        data: { 
+          type:"<?php echo $Type;?>",
+          capacity:"<?php echo $Capacity;?>",
+          version:"<?php echo $Version;?>",
+          Model:"<?php echo $Model;?>",
+          MobNo:"<?php echo $MobNo;?>"
+        }
+      })
+      .done( function (ee_checksum) { 
+        var orgnlChkSum = $('#EE_CHK_SUM').text().toString().toUpperCase();        
+        var newChkSum = "0X"+parseInt(ee_checksum, 10).toString(16).toUpperCase();
+        $("#deviceChecksum").html("<h6 class=\"font-weight-bold mb-0\">0X"+parseInt(ee_checksum, 10).toString(16).toUpperCase()+"</h6>");
+        if (orgnlChkSum.localeCompare(newChkSum) == 0) {
+          $('#status').html("<img src=\"./assets/images/faces/test_Passed.png\"  alt=\"\" width=\"80%\" height=\"50%\">");
+        }
+        else{
+          $('#status').html("<img src=\"./assets/images/faces/test_Failed.png\"  alt=\"\" width=\"80%\" height=\"50%\">");
+        }       
+      })   
+      .fail( function (jqXHR, status, error) {
+
+      })
+      .always( function() {
+
+        //
+
+        // if ( == parseInt(ee_checksum, 10).toString(16)) {
+        //   console.log($("#checkButton").val());
+        // }
 
 
+
+      });
+    }
+    
   </script>
   <script src="./assets/vendors/js/vendor.bundle.base.js"></script>
 

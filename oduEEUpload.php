@@ -35,7 +35,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="unsetButton()">
   <?php
   $Type = $_POST['type'];
   $Capacity = $_POST['capacity'];
@@ -50,7 +50,8 @@
   $dbname = "ee_monitoring";
   $devList = array();
   $data = $_POST;
-    //print_r($data);
+  //print_r($Capacity);
+  // OK 
 
   $conn = new mysqli($servername, $username, $password, $dbname);
   if ($conn->connect_error) {
@@ -59,18 +60,20 @@
 
   $sql = "SELECT * FROM `ee_program_list_odu` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."'; ";
   $result = $conn->query($sql);
+  //print_r($sql);
 
   if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
       array_push( $devList,$row);
-      //$created = $row['created'];
-      //$modified = $row['modified'];
+      $created = $row['created'];
+      $modified = $row['modified'];
     }
   } else {
       //echo "0";
   }
 
   $conn->close();
+  //print_r($created);
   
 
   $navDevList = array();
@@ -91,6 +94,7 @@
     while($row = $conectDevList->fetch_assoc()) {
 
       array_push( $navDevList,$row);
+
     }
   } else {
     echo "0 results";
@@ -198,10 +202,6 @@
             <div class="col-md-6 grid-margin stretch-card" style="overflow-x:auto;">
               <div class="card">
                 <div class="card-body">
-
-
-
-
                   <div class="progress-bar">
                     <div class="progress"></div>
                   </div>
@@ -210,54 +210,8 @@
 
                   <h4 class="card-title">EE Program Uploading Status</h4>
                   <div class="table-responsive div-scroll" >
-                    <table class="table table-bordered table-contextual" >
-
-                      <thead>
-                        <tr>
-                          <th> Add No.</th>
-                          <th> File Data</th>
-                          <th> Device Data </th>
-                          <th> Remarks </th>                            
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                        <?php 
-                        $add = 0;
-                        foreach ($segOne as $key => $value) {
-
-                          echo "<tr class=\"table-danger\">
-                          <td> ".$add." </td>
-                          <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> 0 </td>
-                          <td> FAULT </td>
-                          </tr>";
-                          $add++;
-                        }
-
-                        foreach ($segTwo as $key => $value) {
-
-                          echo "<tr class=\"table-danger\">
-                          <td> ".$add." </td>
-                          <td> ".$value." </td>
-                          <td id=\"add-".$key."\"> 0 </td>
-                          <td> FAULT </td>
-                          </tr>";
-                          $add++;
-                        }
-
-                        ?>
-
-
-                        <tr class="table-success">
-                          <td> 128 </td>
-                          <td> Test </td>
-                          <td> Test </td>
-                          <td> OK </td>
-                        </tr>
-
-                      </tbody>
-                    </table>
+                    <h1 id="status" class="card-body">
+                    </h1>
                   </div>
                 </div>
               </div>              
@@ -269,11 +223,11 @@
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
                 <div class="text-md-center text-xl-left">
                   <h6 class="mb-1">Actual EE Check Sum</h6>
-                  <p class="text-muted mb-0">Created  : <?echo $crjeated;?></p>
-                  <p class="text-muted mb-0">Modified : <?echo $modified;?></p>
+                  <p class="text-muted mb-0">Created  : <?php echo $created;?></p>
+                  <p class="text-muted mb-0">Modified : <?php echo $modified;?></p>
                 </div>
                 <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                  <h6 class="font-weight-bold mb-0">0x<?php echo $checkSum;?></h6>
+                  <h6 id="EE_CHK_SUM"  class="font-weight-bold mb-0">0X<?php echo $checkSum;?></h6>
                 </div>
               </div>
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
@@ -281,9 +235,17 @@
                   <h6 class="mb-1">Device EE Check Sum</h6>
                   <p class="text-muted mb-0">XX XXX XXXX, XX:XX XX</p>
                 </div>
-                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                <div id="deviceChecksum" class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <h6 class="font-weight-bold mb-0">0XXXXX</h6>
                 </div>
+              </div>
+              <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">                  
+                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                  <button id="checkButton" type="button" class="btn btn-success btn-rounded btn-fw not-visible" onclick="checkEE()" disabled >Check EE Version</button>
+                </div>     
+                <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                  <button id="crossMatchButton" type="button" class="btn btn-danger btn-rounded btn-fw not-visible" onclick="crossCheckEE()" disabled >Cross Match</button>
+                </div>           
               </div>
             </div>
 
@@ -291,64 +253,72 @@
 
 
           </div>
-
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Product of <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank"> Residential Air Conditoner</a> Research & Innovation</span>
-            </div>
-          </footer>
-
         </div>
+
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © WALTON 2023</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Product of <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank"> Residential Air Conditoner</a> Research & Innovation</span>
+          </div>
+        </footer>
+
       </div>
     </div>
-  </body>
-  <script src="js/jquery-1.11.2.min.js"></script>
-  <script type="text/javascript">
-    const countdownEl = document.querySelector(".countdown");
-    const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 320; // seconds
+  </div>
+</body>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script>
+  function unsetButton() {
+    $('#checkButton').prop('disabled', false);
+    $('#crossMatchButton').prop('disabled', false);
+  }
+</script>
+<script type="text/javascript">
+  const countdownEl = document.querySelector(".countdown");
+  const progressBarEl = document.querySelector(".progress");
+    let remainingTime = 10; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 280){
+        if(remainingTime == 285){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 240){
+        if(remainingTime == 245){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 200){
+        if(remainingTime == 205){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 160){
+        if(remainingTime == 165){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 120){
+        if(remainingTime == 125){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 80){
+        if(remainingTime == 85){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 40){
+        if(remainingTime == 45){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 2){
+        if(remainingTime == 5){
+          $('#checkButton').prop('disabled', false);
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
@@ -370,7 +340,7 @@
     function updateEESeg(argument) {
       $.ajax({
         type: 'POST',
-        url:  'controller/oducheckSumUpdater.php/',
+        url:  'controller/odu_ee_check.php?',
         data: { 
           type:"<?php echo $Type;?>",
           capacity:"<?php echo $Capacity;?>",
@@ -382,6 +352,33 @@
       })
       .done( function (version) {
 
+      })   
+      .fail( function (jqXHR, status, error) {
+        alert("Fail;")
+      })
+      .always( function() {
+
+      });
+    }
+    
+  </script>
+  <script type="text/javascript">
+    function checkEE(){
+      console.log("TEST");
+
+      $.ajax({
+        type: 'POST',
+        url:  'controller/odu_ee_check.php/',
+        data: { 
+          type:"<?php echo $Type;?>",
+          capacity:"<?php echo $Capacity;?>",
+          version:"<?php echo $Version;?>",
+          Model:"<?php echo $Model;?>",
+          MobNo:"<?php echo $MobNo;?>"
+        }
+      })
+      .done( function (version) {
+
 
       })   
       .fail( function (jqXHR, status, error) {
@@ -389,6 +386,42 @@
       })
       .always( function() {
         $('p:first').after('<p>Thank you.</p>');
+      });
+
+    }
+    
+    function crossCheckEE(argument) {
+      console.log("TEST");
+
+      $.ajax({
+        type: 'POST',
+        url:  'controller/oduCrossCheck.php?',
+        data: { 
+          type:"<?php echo $Type;?>",
+          capacity:"<?php echo $Capacity;?>",
+          version:"<?php echo $Version;?>",
+          Model:"<?php echo $Model;?>",
+          MobNo:"<?php echo $MobNo;?>"
+        }
+      })
+      .done( function (ee_checksum) { 
+        var orgnlChkSum = $('#EE_CHK_SUM').text().toString().toUpperCase();        
+        var newChkSum = "0X"+parseInt(ee_checksum, 10).toString(16).toUpperCase();
+        $("#deviceChecksum").html("<h6 class=\"font-weight-bold mb-0\">0X"+parseInt(ee_checksum, 10).toString(16).toUpperCase()+"</h6>");
+        if (orgnlChkSum.localeCompare(newChkSum) == 0) {
+          $('#status').html("<img src=\"./assets/images/faces/test_Passed.png\"  alt=\"\" width=\"80%\" height=\"50%\">");
+        }
+        else{
+          $('#status').html("<img src=\"./assets/images/faces/test_Failed.png\"  alt=\"\" width=\"80%\" height=\"50%\">");
+        }       
+      })   
+      .fail( function (jqXHR, status, error) {
+
+      })
+      .always( function() {
+
+       
+
       });
     }
     
