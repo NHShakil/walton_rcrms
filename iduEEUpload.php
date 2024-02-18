@@ -80,7 +80,10 @@
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
-
+  
+$sql = "UPDATE `live_device` SET `cmd` = '2' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  //echo($sql);
+  $conn->query($sql);
 
   $sql ="UPDATE `live_updating_table` SET `data` = '".$devList[0]['segMnt_one']."' WHERE `live_updating_table`.`mobNo` = '".$MobNo."'; ";
   $conn->query($sql);
@@ -315,7 +318,7 @@
     function updateEESeg(argument) {
       $.ajax({
         type: 'POST',
-        url:  'controller/idu_ee_check.php/?',
+        url:  'controller/checkSumUpdater.php/?',
         data: { 
           type:"<?php echo $Type;?>",
           capacity:"<?php echo $Capacity;?>",

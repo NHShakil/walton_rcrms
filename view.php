@@ -170,7 +170,7 @@
             <div class="col-xl-3 col-sm-6 grid-margin stretch-card" >
               <div class="card">
                 <div class="card-body">
-                  <div class="row"><img src="./assets/images/faces/off.png" alt="" width="100%" height="50%">
+                  <div class="row"><img src="./assets/images/faces/on.png" alt="" width="100%" height="50%">
                   </div>
                   <h3 class="mb-0" align="center">Device Connected</h3>
                 </div>

@@ -87,6 +87,8 @@
   }
 
   //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
+  //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
+  
 
   $Alarm_clr = array(
     "outline-secondary", // Blank
@@ -223,13 +225,14 @@
 
   /************ Packet Three Data Acqusition *********/
   //print_r($Packet_Three);
+
   if ($Packet_Three == NULL) {
     $Pac_3_Data =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
   }else{
     $Pac_3_Data = rtrim($Packet_Three, ",");
     $Pac_3_Data = explode(",",$Packet_Three);
   }
-
+  //echo "<pre>";print_r($Pac_3_Data);echo "</pre>";
   
   $compModelName = "";
   for ($i=2; $i < 18; $i++) { 
