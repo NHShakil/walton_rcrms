@@ -58,6 +58,9 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
+  $sql = "UPDATE `live_device` SET `cmd` = '3' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  $conn->query($sql);
+
   $sql = "SELECT * FROM `ee_program_list_odu` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."'; ";
   $result = $conn->query($sql);
   //print_r($sql);

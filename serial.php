@@ -49,6 +49,8 @@
   } else {
     echo "0 results";
   }
+  $sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  $conn->query($sql);
   
 
   $sql = "SELECT * FROM `dev_last_sts` WHERE `mob_no`='".$mobileNo."'; ";
