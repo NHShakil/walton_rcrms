@@ -80,9 +80,10 @@
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
-  $sql = "UPDATE `live_device` SET `cmd` = '2' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  
+$sql = "UPDATE `live_device` SET `cmd` = '2' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  //echo($sql);
   $conn->query($sql);
-
 
   $sql ="UPDATE `live_updating_table` SET `data` = '".$devList[0]['segMnt_one']."' WHERE `live_updating_table`.`mobNo` = '".$MobNo."'; ";
   $conn->query($sql);
@@ -229,7 +230,8 @@
               </div>
               <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
                 <div class="text-md-center text-xl-left">
-                  <h6 class="mb-1">Device EE Check Sum</h6>                  
+                  <h6 class="mb-1">Device EE Check Sum</h6>
+                  <p class="text-muted mb-0">XX XXX XXXX, XX:XX XX</p>
                 </div>
                 <div id="deviceChecksum" class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                   <h6  class="font-weight-bold mb-0">0XXXXX</h6>
@@ -270,7 +272,7 @@
 <script type="text/javascript">
   const countdownEl = document.querySelector(".countdown");
   const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 130; // seconds
+    let remainingTime = 165; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 

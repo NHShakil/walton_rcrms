@@ -35,10 +35,7 @@ if ($result->num_rows > 0) {
 } else {
   print_r("0X0000");
 }
-$sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
-$conn->query($sql);
 $conn->close();
-
 print_r ($data);
 ?>
 

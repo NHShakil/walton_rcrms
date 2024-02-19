@@ -25,7 +25,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "SELECT * FROM `ee_program_list` WHERE `type`='".$Type."' AND `capacity`='".$Capacity."' AND `version`='".$Version."' AND `model`='".$Model."';";
-echo $sql;
+//echo $sql;
 $result  = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -35,9 +35,9 @@ if ($result->num_rows > 0) {
 } else {
   echo "0 results";
 }
-echo "<pre>";
-print_r($EE_Data[1]['segMnt_Two']);
-echo "</pre>";
+// echo "<pre>";
+// print_r($EE_Data[1]['segMnt_Two']);
+// echo "</pre>";
 
 
 if($Segment == '1'){
@@ -56,9 +56,9 @@ if($Segment == '4'){
 $sql = "UPDATE `live_updating_table` SET `data`='".$ee_seg."' WHERE `mobNo`='".$MobNo."';";
   $conn->query($sql);
   $conn->close();
-  echo "<pre>";
-print_r($sql);
-echo "</pre>";
+//   echo "<pre>";
+// print_r($sql);
+// echo "</pre>";
 ?>
 
 
