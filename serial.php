@@ -88,7 +88,7 @@
     $segmntedPacTwo = explode(",", $Packet_Two);
   }
 
-  //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
+  echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
 
   $Alarm_clr = array(
     "outline-secondary", // Blank
@@ -542,7 +542,7 @@
                           <td><button type="button" class="btn btn-<?php echo $PFC;?> btn-rounded btn-icon">
                           </button></td>
                           <td>IDU Fault</td>
-                          <td><button type="button" class="btn btn-outline-secondary  btn-rounded btn-icon">
+                          <td><button type="button" class="btn btn-outline-secondary btn-rounded btn-icon">
                           </button></td>                       
                         </tr>
                       </tbody>
