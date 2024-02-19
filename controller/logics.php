@@ -244,11 +244,19 @@ function modeDetection($DataVal)
 
 function IduFaultDetection($DataVal)
 {	
-	$IduFault_Reason = array("IDU Fan failure","Te failure","Tr failure","Fluoride free protection","WiFi failure","Abnormal zero crossing detection of IDU Fan","IDU EE failure");
+	$IduFault_Reason = array(
+		"IDU Fan failure",
+		"Te failure",
+		"Tr failure",
+		"Fluoride free protection",
+		"WiFi failure",
+		"Abnormal zero crossing detection of IDU Fan",
+		"IDU EE failure"
+	);
 
 	$Bits =array_reverse(str_split(sprintf('%08b',  $DataVal),1));
 	//echo "<pre>";print_r($Bits);echo "</pre>";
-	$result = array("");
+	$result = array("-----");
 	foreach ($Bits as $key => $value) {
 		if($value == 1){
 			array_push($result,$IduFault_Reason[$key]);
@@ -256,33 +264,49 @@ function IduFaultDetection($DataVal)
 		}
 	}	
 	//echo "<pre>";print_r($result);echo "</pre>";
-	return $result;
+	return $result[1];
 }
 
 function ODUTypeChecker($DataVal)
 {	
-	$ODU_MCU_Type = array("TI_F2802x" ,"TI_F2803x","TI_F28002x","RX23T5");
+	$ODU_MCU_Type = array(
+		"-----",
+		"MGMT-TI-F2802x",
+		"MGMT-TI-F2803x",
+		"MGMT-TI-F28002x",
+		"MGMT-RX23T5",
+		"MGMT-HX320F2802x"
+	);
 	$Bits = array_reverse(str_split(sprintf('%08b',  $DataVal),1));	
 
-	if($Bits[4] == 1){
+	switch ($DataVal) {
+		case 0:
 		return $ODU_MCU_Type[0];
-		//break;
-	}
-	else if($Bits[5] == 1){
+		break;
+
+		case 16:
 		return $ODU_MCU_Type[1];
-		//break;
-	}
-	else if($Bits[6] == 1){
+		break;
+
+		case 32:
 		return $ODU_MCU_Type[2];
-		//break;
-	}
-	else if($Bits[7] == 1){
+		break;
+
+		case 48:
 		return $ODU_MCU_Type[3];
-		//break;
-	}
-	else{
+		break;
+
+		case 64:
+		return $ODU_MCU_Type[4];	
+		break;
+		
+		case 80:
+		return $ODU_MCU_Type[5];
+		break;
+		
+		default:
 		return "Not Detected";
-		//break;
+		break;
 	}
 	//echo "<pre>";print_r($Bits);echo "</pre>";
 	//return $result;
@@ -294,6 +318,34 @@ function On_Off_FLG_Detect ($DataVal)
 	$Bits = array_reverse(str_split(sprintf('%08b',  $DataVal),1));
 	//echo "<pre>";print_r($Bits[0]);echo "</pre>";
 	return $sts = ($Bits[0] == 1) ? "ON" : "OFF" ;
+}
+
+
+function timeConverter($HighValue,$LowValue)
+{
+
+	$HIGH_BYTE 	= array_reverse(str_split(sprintf('%08b',  $HighValue),1));
+	$LOW_BYTE 	= array_reverse(str_split(sprintf('%08b',  $LowValue),1));
+	
+	//echo "<pre>";print_r($LOW_BYTE);echo "</pre>";
+	$TIME = $HIGH_BYTE[7]*32768+
+	$HIGH_BYTE[6]*16384+
+	$HIGH_BYTE[5]*8192+
+	$HIGH_BYTE[4]*4096+
+	$HIGH_BYTE[3]*2048+
+	$HIGH_BYTE[2]*1024+
+	$HIGH_BYTE[1]*512+
+	$HIGH_BYTE[0]*256+
+	$LOW_BYTE[7]*128+
+	$LOW_BYTE[6]*64+
+	$LOW_BYTE[5]*32+
+	$LOW_BYTE[4]*16+
+	$LOW_BYTE[3]*8+
+	$LOW_BYTE[2]*4+
+	$LOW_BYTE[1]*2+
+	$LOW_BYTE[0]*1;
+	return $TIME;
+	// Binary to decimal conversion algorithm
 }
 
 

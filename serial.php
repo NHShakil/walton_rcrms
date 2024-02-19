@@ -49,7 +49,7 @@
   } else {
     echo "0 results";
   }
-  $sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  $sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$mobileNo."';"; 
   $conn->query($sql);
   
 
@@ -88,7 +88,7 @@
     $segmntedPacTwo = explode(",", $Packet_Two);
   }
 
-  //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
+  //echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
 
   $Alarm_clr = array(
     "outline-secondary", // Blank
@@ -218,10 +218,18 @@
     $Packet_Two = rtrim($Packet_Two, ",");
     $segmntedPacOne =  explode(",", $Packet_Two) ; 
   }
-  $Time_STS = On_Off_FLG_Detect ($segmntedPacTwo[4]);
-  $FAN_IPM = $segmntedPacTwo[7];
-  $IDU_FAULT= "*******";//IduFaultDetection($segmntedPacTwo[8]);
-
+  $Time_STS     = On_Off_FLG_Detect ($segmntedPacTwo[4]);
+  $Time         = timeConverter($segmntedPacTwo[5],$segmntedPacTwo[6]);
+  $FAN_IPM      = $segmntedPacTwo[7];
+  
+  //BYTE 8+9 
+  //IDU Fault Detectation
+  if ($segmntedPacTwo[8] == 0) {
+    $IDU_FAULT   = "----";
+  }else{
+    $IDU_FAULT    = IduFaultDetection($segmntedPacTwo[8]);
+  }
+ 
 
   /************ Packet Three Data Acqusition *********/
   //print_r($Packet_Three);
@@ -533,8 +541,8 @@
                           <td>PFC</td>
                           <td><button type="button" class="btn btn-<?php echo $PFC;?> btn-rounded btn-icon">
                           </button></td>
-                          <td>In Fault</td>
-                          <td><button type="button" class="btn btn-<?php echo $In_Flt;?> btn-rounded btn-icon">
+                          <td>IDU Fault</td>
+                          <td><button type="button" class="btn btn-outline-secondary  btn-rounded btn-icon">
                           </button></td>                       
                         </tr>
                       </tbody>
@@ -581,7 +589,7 @@
               <div class="card-body">
                 <div class="template-demo">
                   <h1 class="display-5">Te: <?php echo $Te."°C";?></h1>
-                  <h1 class="display-5">IDU Fault : <?php print_r($IDU_FAULT[1]);?></h1>
+                  <h1 class="display-5">IDU Fault : <?php echo($IDU_FAULT);?></h1>
                 </div>
               </div>
             </div>
@@ -643,7 +651,7 @@
                   <h3 class="display-5">DC VOL: <?php echo $DC_VOLT;?></h3>
                   <h3 class="display-5">AC CUR: <?php echo $AC_CRNT;?></h3>
                   <h3 class="display-5">AC VOL : <?php echo $AC_VOLT;?></h3>
-                  <h3 class="display-5">Off Time : <?php echo "------";?></h3>
+                  <h3 class="display-5"><?php echo $Time_STS;?> Time : <?php echo $Time." Sec";?></h3>
                   
                   
                 </div>
@@ -653,8 +661,8 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card-body">
                 <div class="template-demo">
-                  <h3 class="display-5">Comp Type : <?php echo $comp_type ;?></h3>
-                  <h3 class="display-5">ODU Type : <?php echo $ODUType;?></h3>
+                  <h3 class="display-5">Machine Type : <?php echo $comp_type ;?></h3>
+                  <h3 class="display-5">System Type : <?php echo $ODUType;?></h3>
                   <h3 class="display-5">FAN IPM : <?php echo $FAN_IPM."°C";?></h3>
                   <h1 class="display-5">MCU Checksum: <?php echo $ODU_MCU_CheckSum;?></h1>
                   <h1 class="display-5">EE Checksum: <?php echo $ODU_EE_CheckSum;?></h1>                  
