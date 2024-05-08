@@ -82,6 +82,9 @@
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
+  $sql = "UPDATE `live_device` SET `cmd` = '3' WHERE `live_device`.`mob_no`='".$MobNo."';"; 
+  //echo($sql);
+  $conn->query($sql);
 
 
   $sql ="UPDATE `live_updating_table` SET `data` = '".$devList[0]['segMnt_one']."' WHERE `live_updating_table`.`mobNo` = '".$MobNo."'; ";
@@ -276,48 +279,48 @@
 <script type="text/javascript">
   const countdownEl = document.querySelector(".countdown");
   const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 10; // seconds
+    let remainingTime = 70; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 285){
+        if(remainingTime == 62){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 245){
+        if(remainingTime == 55){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 205){
+        if(remainingTime == 48){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 165){
+        if(remainingTime == 40){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 125){
+        if(remainingTime == 32){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 85){
+        if(remainingTime == 23){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 45){
+        if(remainingTime == 13){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 5){
+        if(remainingTime == 2){
           $('#checkButton').prop('disabled', false);
           EE_segMent++;
           console.log(EE_segMent);
@@ -340,7 +343,7 @@
     function updateEESeg(argument) {
       $.ajax({
         type: 'POST',
-        url:  'controller/odu_ee_check.php?',
+        url:  'controller/checkSumUpdaterOdu.php?',
         data: { 
           type:"<?php echo $Type;?>",
           capacity:"<?php echo $Capacity;?>",

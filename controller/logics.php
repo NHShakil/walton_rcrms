@@ -7,7 +7,7 @@ function FaultByteChecker($DataVal,$Color)
 		"Ta sensor",
 		"Tc sensor",
 		"Td sensor",
-		"ODU Communication Fault",
+		"ODU Communication",
 		"ODU Fan",
 		"Compressor Drive",
 		"IPM"
@@ -245,13 +245,13 @@ function modeDetection($DataVal)
 function IduFaultDetection($DataVal)
 {	
 	$IduFault_Reason = array(
-		"IDU Fan failure",
-		"Te failure",
-		"Tr failure",
+		"IDU Fan Fault",
+		"Te Fault",
+		"Tr Fault",
 		"Fluoride free protection",
-		"WiFi failure",
-		"Abnormal zero crossing detection of IDU Fan",
-		"IDU EE failure"
+		"WiFi Fault",
+		"FAN 0 crossing Abnormal",
+		"IDU EE Fault"
 	);
 
 	$Bits =array_reverse(str_split(sprintf('%08b',  $DataVal),1));

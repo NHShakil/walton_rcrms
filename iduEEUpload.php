@@ -272,28 +272,28 @@ $sql = "UPDATE `live_device` SET `cmd` = '2' WHERE `live_device`.`mob_no`='".$Mo
 <script type="text/javascript">
   const countdownEl = document.querySelector(".countdown");
   const progressBarEl = document.querySelector(".progress");
-    let remainingTime = 165; // seconds
+    let remainingTime = 35; // seconds
     const totalTime = remainingTime;
     var EE_segMent = 0;
 
     function countdown() {
       if (remainingTime > 0) {
-        if(remainingTime == 125){
+        if(remainingTime == 27){
           EE_segMent++;          
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 85){
+        if(remainingTime == 18){
           EE_segMent++;
           console.log("BAL:"+EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 45){
+        if(remainingTime == 9){
           EE_segMent++;
           console.log(EE_segMent);
           updateEESeg(EE_segMent);
         }
-        if(remainingTime == 5){
+        if(remainingTime == 2){
           $('#checkButton').prop('disabled', false);
           updateEESeg();
           EE_segMent++;

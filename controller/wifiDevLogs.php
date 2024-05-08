@@ -100,11 +100,11 @@ $EE_Data = "";
 //$opCMD = 0;
 		// Server Connectivity only. Nocommand for Device
 if($opCMD == 0){
-	$EE_Data .= "SRV,0";
+	$EE_Data .= "SRV,0,";
 }
 		// Serail Communication Only
 else if($opCMD == 1){
-	$EE_Data .= "SRL,1";
+	$EE_Data .= "SRL,1,";
 }
 		// Write IDU CheckSUM
 else if($opCMD == 2){

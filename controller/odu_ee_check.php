@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 	die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "UPDATE `live_device` SET `cmd`='5' WHERE `mob_no`='".$MobNo."';";
+$sql = "UPDATE `live_device` SET `cmd`='3' WHERE `mob_no`='".$MobNo."';";
 
 $conn->query($sql);
 $conn->close();

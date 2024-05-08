@@ -49,8 +49,8 @@
   } else {
     echo "0 results";
   }
-  $sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$mobileNo."';"; 
-  $conn->query($sql);
+  // $sql = "UPDATE `live_device` SET `cmd` = '1' WHERE `live_device`.`mob_no`='".$mobileNo."';"; 
+  // $conn->query($sql);
   
 
   $sql = "SELECT * FROM `dev_last_sts` WHERE `mob_no`='".$mobileNo."'; ";
@@ -88,7 +88,7 @@
     $segmntedPacTwo = explode(",", $Packet_Two);
   }
 
-  echo "<pre>";print_r($segmntedPacTwo);echo "</pre>";
+  
 
   $Alarm_clr = array(
     "outline-secondary", // Blank
@@ -99,7 +99,7 @@
 
 
   /************ Packet One Data Acqusition *********/
-
+  //echo "<pre>";print_r($segmntedPacOne);echo "</pre>";
   $ODUType     = ODUTypeChecker($segmntedPacOne[1]);
 
   // Byte_2 Description
@@ -107,10 +107,10 @@
   $Byte_2     = array("Standby" ,"Cool","Heat","Fan","DRY","","","Test","SelfTest");
   $Mode = $Byte_2[$segmntedPacOne[2]];
 
-  $Real_Freq = $segmntedPacOne[3];
-  $Real_Freq_RPM = $segmntedPacOne[3]*60;
-  $targ_Freq = $segmntedPacOne[4];
-  $Set_Freq = $segmntedPacOne[5];
+  $Real_Freq = hexdec($segmntedPacOne[3]);
+  $Real_Freq_RPM = $Real_Freq*60;
+  $targ_Freq = hexdec($segmntedPacOne[4]);
+  $Set_Freq = hexdec($segmntedPacOne[5]);
   
 
 
@@ -119,72 +119,90 @@
     $Fault  = array("");
     array_push($Fault,"OK",$Alarm_clr[2]);
   }else{
-    $Fault  = FaultByteChecker($segmntedPacOne[6],$Alarm_clr);
+    $Fault  = FaultByteChecker(hexdec($segmntedPacOne[6]),$Alarm_clr);
   }
 
 
   // Byte_07 Description
-  if ($segmntedPacOne[7] == 0) {
+  $Byte_07 = hexdec($segmntedPacOne[7]);
+  if ($Byte_07 == 0) {
     $Protection   = array("");
     array_push($Protection,"OK",$Alarm_clr[2]);
   }else{
-    $Protection   = ProtectionByteChecker($segmntedPacOne[7],$Alarm_clr);
+    $Protection   = ProtectionByteChecker($Byte_07,$Alarm_clr);
   }
 
 
   // Byte_08 Description
+  $Byte_08 = hexdec($segmntedPacOne[8]);
   if ($segmntedPacOne[8] == 0) {
     $Limit   = array("");
     array_push($Limit,"OK",$Alarm_clr[2]);
   }else{
-    $Limit   = LimitByteChecker($segmntedPacOne[8],$Alarm_clr);
+    $Limit   = LimitByteChecker($Byte_08,$Alarm_clr);
   }
 
 
-  $Ts      = ($segmntedPacOne[9]-60)/2;
-  $Tr      = ($segmntedPacOne[10]-60)/2;
-  $Ta      = ($segmntedPacOne[11]-60)/2;
-  $Td      =  $segmntedPacOne[12]-30;
-  $Te      = ($segmntedPacOne[13]-60)/2;
-  $Tc      = ($segmntedPacOne[14]-60)/2;
-  $AC_VOLT = ($segmntedPacOne[15]*2);
-  $AC_CRNT = ($segmntedPacOne[16]/10);
+  $Ts      = ((hexdec($segmntedPacOne[9]))-60)/2;
+  $Tr      = (hexdec($segmntedPacOne[10])-60)/2;
+  $Ta      = (hexdec($segmntedPacOne[11])-60)/2;
+  $Td      =  hexdec($segmntedPacOne[12])-30;
+  $Te      = (hexdec($segmntedPacOne[13])-60)/2;
+  $Tc      = (hexdec($segmntedPacOne[14])-60)/2;
+  $AC_VOLT = (hexdec($segmntedPacOne[15])*2);
+  $AC_CRNT = (hexdec($segmntedPacOne[16])/10);
   // Byte_17 Description
-  $ERRcode = ERRCodeDetection($segmntedPacOne[17]);
+  $ERRcode = ERRCodeDetection(hexdec($segmntedPacOne[17]));
   // Byte_18 Description
-  if(($segmntedPacOne[18])==0){
-    //print_r("FUCk.....");
+  $Byte_18 = hexdec($segmntedPacOne[18]);
+  if($Byte_18==0){
     $Compressor = $Alarm_clr[0];
     $RetnOil = $Alarm_clr[0];
     $OutFan = $Alarm_clr[0];
     $FourWay= $Alarm_clr[0];
     $TestMod= $Alarm_clr[0];
     $PreHeat= $Alarm_clr[0];
+    $DeFrst= $Alarm_clr[0];
   }else{
-    $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
-    $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
-    $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $FreqAlarms   =  str_split(decbin($segmntedPacOne[18]),1);
+
+
+    // $Compressor = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $RetnOil    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $OutFan     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $FourWay    = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $DeFrst     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $TestMod    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    // $PreHeat    = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+
+    $FreqAlarms   =  array_reverse(str_split(sprintf('%08b',  $Byte_18),1));
+    //echo "<pre>";print_r($segmntedPacOne[18]);echo "</pre>";
+    //echo "<pre>";print_r($FreqAlarms);echo "</pre>";
+    $Compressor = ($FreqAlarms[7] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $RetnOil    = ($FreqAlarms[6] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $OutFan     = ($FreqAlarms[5] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $Turbo      = ($FreqAlarms[4] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $FourWay    = ($FreqAlarms[3] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $DeFrst     = ($FreqAlarms[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $TestMod    = ($FreqAlarms[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
+    $PreHeat    = ($FreqAlarms[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   }
   // Byte_19 Description
   // Indoor FAN Wind Speed Level
   $Byte_19      = array("Stopped","Faint","Silent","Low","Mid","High","Powerful");
-  $IDU_Fan_Speed= $Byte_19[$segmntedPacOne[19]];
-  $DC_VOLT      = ($segmntedPacOne[20]*2);
-  $DC_CRNT      = ($segmntedPacOne[21]/10);
-  $ODU_Fan_Speed= $segmntedPacOne[22]*10;
-  $comp_type    = $segmntedPacOne[23];
+  $Byte_19_val  = hexdec($segmntedPacOne[19]);
+  $IDU_Fan_Speed= $Byte_19[$Byte_19_val];
+  $DC_VOLT      = (hexdec($segmntedPacOne[20])*2);
+  $DC_CRNT      = (hexdec($segmntedPacOne[21])/10);
+  $ODU_Fan_Speed= hexdec($segmntedPacOne[22])*10;
+  $comp_type    = hexdec($segmntedPacOne[23]);
   $Byte_24      = array("A","B","C","D","E","F","G","H","I","J");
-  $Tipm         = $segmntedPacOne[26];
+  $Tipm         = hexdec($segmntedPacOne[26]);
 
   
   // Byte_27 Description
   $Byte_27    = array("Permanent stop sign","IDU failure","mould proof","ECO mode","PFC open");
-  $FreqAlarms2= array_reverse(str_split(sprintf('%08b',  $segmntedPacOne[27]),1));
+  $FreqAlarms2= array_reverse(str_split(sprintf('%08b',  hexdec($segmntedPacOne[27]),1)));
   $permStpSgn = ($FreqAlarms2[0] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   $IDUFail    = ($FreqAlarms2[1] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
   $MoldPrf    = ($FreqAlarms2[2] == 1) ? $Alarm_clr[2] : $Alarm_clr[0] ;
@@ -193,22 +211,23 @@
   
 
   // Byte_28 Description
-  if ($segmntedPacOne[28] == 0) {
+  $Byte_28    = hexdec($segmntedPacOne[28]);
+  if ($Byte_28 == 0) {
     $DownFreq   = array("");
     array_push($DownFreq,"OK",$Alarm_clr[2]);
   }else{
-    $DownFreq   = DownFreqByteChecker($segmntedPacOne[28],$Alarm_clr);
+    $DownFreq   = DownFreqByteChecker($Byte_28,$Alarm_clr);
   }
 
   // Byte_32 Description
-  $RatedModeLowNibble = modeDetection($segmntedPacOne[32]);
+  $RatedModeLowNibble = modeDetection(hexdec($segmntedPacOne[32]));
 
   
   // Byte_33 Description
-  $IDU_Fan_Speed_RPM = $segmntedPacOne[33]*10;
+  $IDU_Fan_Speed_RPM = hexdec($segmntedPacOne[33])*10;
   
 
-  $version = "20".$segmntedPacOne[34]."-".$segmntedPacOne[35]."-".$segmntedPacOne[36];
+  $version = "20".hexdec($segmntedPacOne[34])."-".hexdec($segmntedPacOne[35])."-".hexdec($segmntedPacOne[36]);
 
   
   /************ Packet Two Data Acqusition *********/
@@ -218,18 +237,18 @@
     $Packet_Two = rtrim($Packet_Two, ",");
     $segmntedPacOne =  explode(",", $Packet_Two) ; 
   }
-  $Time_STS     = On_Off_FLG_Detect ($segmntedPacTwo[4]);
-  $Time         = timeConverter($segmntedPacTwo[5],$segmntedPacTwo[6]);
-  $FAN_IPM      = $segmntedPacTwo[7];
+  $Time_STS     = On_Off_FLG_Detect (hexdec($segmntedPacTwo[4]));
+  $Time         = timeConverter(hexdec($segmntedPacTwo[5]),hexdec($segmntedPacTwo[6]));
+  $FAN_IPM      = hexdec($segmntedPacTwo[7]);
   
   //BYTE 8+9 
   //IDU Fault Detectation
-  if ($segmntedPacTwo[8] == 0) {
+  if (hexdec($segmntedPacTwo[8]) == 0) {
     $IDU_FAULT   = "----";
   }else{
-    $IDU_FAULT    = IduFaultDetection($segmntedPacTwo[8]);
+    $IDU_FAULT    = IduFaultDetection(hexdec($segmntedPacTwo[8]));
   }
- 
+
 
   /************ Packet Three Data Acqusition *********/
   //print_r($Packet_Three);
@@ -242,13 +261,13 @@
 
   
   $compModelName = "";
-  for ($i=2; $i < 18; $i++) { 
-    $compModelName .=chr($Pac_3_Data[$i]);
+  for ($i=2; $i < 14; $i++) { 
+    $compModelName .=chr(hexdec($Pac_3_Data[$i]));
   }
-  $ODU_EE_CheckSum  = "0x".strtoupper(dechex($Pac_3_Data[30]).dechex($Pac_3_Data[31]));
-  $ODU_MCU_CheckSum = "0x".strtoupper(dechex($Pac_3_Data[28]).dechex($Pac_3_Data[29]));
-  $IDU_EE_CheckSum  = "0x".strtoupper(dechex($Pac_3_Data[35]).dechex($Pac_3_Data[36]));
-  $IDU_MCU_CheckSum = "0x".strtoupper(dechex($Pac_3_Data[32]).dechex($Pac_3_Data[33]).dechex($Pac_3_Data[34]));
+  $ODU_EE_CheckSum  = "0x".strtoupper($Pac_3_Data[30].$Pac_3_Data[31]);
+  $ODU_MCU_CheckSum = "0x".strtoupper($Pac_3_Data[28].$Pac_3_Data[29]);
+  $IDU_EE_CheckSum  = "0x".strtoupper($Pac_3_Data[35].$Pac_3_Data[36]);
+  $IDU_MCU_CheckSum = "0x".strtoupper($Pac_3_Data[32].$Pac_3_Data[33].$Pac_3_Data[34]);
   
   
   ?>
@@ -526,7 +545,7 @@
                           <td><button type="button" class="btn btn-<?php echo $PreHeat;?> btn-rounded btn-icon">
                           </button></td>
                           <td>Turbo</td>
-                          <td><button type="button" class="btn btn-<?php //echo $Compressor;?> btn-rounded btn-icon">
+                          <td><button type="button" class="btn btn-<?php echo $Turbo;?> btn-rounded btn-icon">
                           </button></td>                          
                         </tr>
                         <tr>
@@ -542,7 +561,7 @@
                           <td><button type="button" class="btn btn-<?php echo $PFC;?> btn-rounded btn-icon">
                           </button></td>
                           <td>IDU Fault</td>
-                          <td><button type="button" class="btn btn-outline-secondary btn-rounded btn-icon">
+                          <td><button type="button" class="btn btn-<?php echo $IDUFail;?> btn-rounded btn-icon">
                           </button></td>                       
                         </tr>
                       </tbody>
@@ -702,15 +721,15 @@
       .done( function (responseText) {
             // Triggered if response status code is 200 (OK)
       //$('#message').html('Your message is: ' + responseText);
-      })
+    })
       .fail( function (jqXHR, status, error) {
             // Triggered if response status code is NOT 200 (OK)
-        alert("Fail;")
-      })
+            alert("Fail;")
+          })
       .always( function() {
             // Always run after .done() or .fail()
-        $('p:first').after('<p>Thank you.</p>');
-      });
+            $('p:first').after('<p>Thank you.</p>');
+          });
     }
   </script>
 </head>
