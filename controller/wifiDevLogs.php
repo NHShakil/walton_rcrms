@@ -32,7 +32,7 @@ $username = "root";
 $password = "";
 $dbname = "ee_monitoring";
 $DBMatchtID = "";
-
+//print_r($rcvData);
 $pram[3]=(isset($pram[3]) === true && empty($pram[3]) === true) ? "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" : $pram[3];
 
 $pram[4]=(isset($pram[4]) === true && empty($pram[4]) === true) ? "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" : $pram[4];
@@ -67,9 +67,9 @@ if ($result->num_rows > 0) {
 	}
 		// UPDATE Device Last status Table
 		//$sql = "UPDATE `dev_last_sts` SET `mob_no`='".$pram[1]."',`signal_Lvl`='".$pram[2]."',`serial_pac_one`='".$pram[3]."',`serial_pac_two`='".$pram[4]."',`serial_pac_three`='".$pram[5]."',`idu_ee`='".$pram[6]."',`modified`=current_timestamp() WHERE `id`='".$DBMatchtID."'; ";
-
+	//print_r($pram);
 	$sql = "UPDATE `dev_last_sts` SET `mob_no`='".$pram[1]."',`signal_Lvl`='".$pram[2]."',`serial_pac_one`='".$pram[3]."',`serial_pac_two`='".$pram[4]."',`serial_pac_three`='".$pram[5]."',`idu_ee`='".$pram[6]."',`odu_ee`='".$pram[7]."',`ee_port_sts`='".$pram[8]."',`modified`=current_timestamp() WHERE `id`='".$DBMatchtID."';";
-
+	//echo $sql;
 	$conn->query($sql);
 		// UPDATE Device Last status Table
 	$sql = "UPDATE `live_device` SET `mob_no`='".$pram[1]."',`status`='1',`modified`=current_timestamp() WHERE `device_Id` = '".$pram[0]."';";
