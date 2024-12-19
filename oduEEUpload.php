@@ -37,10 +37,11 @@
 </head>
 <body onload="unsetButton()">
   <?php
+  //print_r($_POST);
   $Type = $_POST['type'];
   $Capacity = $_POST['capacity'];
   $Version = $_POST['version'];
-  $Model = $_POST['Model'];
+  $Model = $_POST['Series'];
   $MobNo = $_POST['MobNo'];
 
 

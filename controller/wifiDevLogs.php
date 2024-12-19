@@ -98,15 +98,15 @@ if ($result->num_rows > 0) {
 		//echo $opCMD."-------";
 $EE_Data = "";
 //$opCMD = 0;
-		// Server Connectivity only. Nocommand for Device
+// Server Connectivity only. Nocommand for Device
 if($opCMD == 0){
 	$EE_Data .= "SRV,0,";
 }
-		// Serail Communication Only
+// Serail Communication Only
 else if($opCMD == 1){
 	$EE_Data .= "SRL,1,";
 }
-		// Write IDU CheckSUM
+// Write IDU CheckSUM
 else if($opCMD == 2){
 	$EE_Data = "WIC,2,";
 	$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
@@ -119,7 +119,7 @@ else if($opCMD == 2){
 	$conn->close();
 	//echo $EE_Data;
 }
-		// Write ODU CheckSUM
+// Write ODU CheckSUM
 else if($opCMD == 3){
 	$EE_Data = "WOC,3,";
 	$sql = "SELECT * FROM `live_updating_table` WHERE `mobNo`='".$pram[1]."';";
@@ -133,11 +133,11 @@ else if($opCMD == 3){
 }
 
 
-		// Read IDU CheckSUm
+// Read IDU CheckSUm
 else if($opCMD == 4){
 	$EE_Data .= "RIC,4,";
 }
-		// Read ODU CheckSUm
+// Read ODU CheckSUm
 else if($opCMD == 5){
 	$EE_Data .= "ROC,5,";
 }	

@@ -11,14 +11,26 @@ $username = "root";
 $password = "";
 $dbname = "ee_monitoring";
 
+$pram = explode(",",$_GET['Data']);
+
+//print_r($pram);
+
+$tableName = ($pram[1]=='IDU') ? "`ee_program_list`" : "`ee_program_list_odu`" ;
+
+$versionList = "";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "ee_monitoring";
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
 	die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT DISTINCT `version` FROM ".$tableName." WHERE `capacity`='".$pram[0]."'; "; 
-//$sql = "SELECT `version` FROM ".$tableName." WHERE `capacity`='".$pram[0]."'; ";
+//$sql = "SELECT DISTINCT `version` FROM ".$tableName." WHERE `capacity`='".$pram[0]."'; "; 
+$sql = "SELECT `model` FROM ".$tableName." WHERE `version`='".$pram[0]."'; ";
 //echo $sql;
 $result = $conn->query($sql);
 
@@ -26,7 +38,7 @@ if ($result->num_rows > 0) {
 	while($row = $result->fetch_assoc()) {
 		//array_push( $versionList,$row);
 		//echo $row['version'];
-		$versionList .= $row['version'].",";
+		$versionList .= $row['model'].",";
 	}
 } else {
 	$versionList .= ("No Version Found,");

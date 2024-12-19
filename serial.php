@@ -251,7 +251,7 @@
 
 
   /************ Packet Three Data Acqusition *********/
-  print_r($Packet_Three);
+  //print_r($Packet_Three);
   if ($Packet_Three == NULL) {
     $Pac_3_Data =explode(",","0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") ;
   }else{
@@ -264,7 +264,7 @@
   for ($i=2; $i < 14; $i++) { 
     $compModelName .=chr(hexdec($Pac_3_Data[$i]));
   }
-  echo gettype($Pac_3_Data[30]);
+  //echo gettype($Pac_3_Data[30]);
   $ODU_EE_CheckSum  = "0x".strtoupper(sprintf('%02d',$Pac_3_Data[30]).sprintf('%02d',$Pac_3_Data[31]));
   $ODU_MCU_CheckSum = "0x".strtoupper(sprintf('%02d',$Pac_3_Data[28]).sprintf('%02d',$Pac_3_Data[29]));
   $IDU_EE_CheckSum  = "0x".strtoupper(sprintf('%02d',$Pac_3_Data[35]).sprintf('%02d',$Pac_3_Data[36]));

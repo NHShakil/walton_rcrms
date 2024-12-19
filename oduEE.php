@@ -196,18 +196,14 @@
 
                     <div class="form-group">
                       <label for="exampleFormControlSelect3">Version</label>
-                      <select id ="version" class="form-control form-control-sm" name="version" >                       
+                      <select id ="version" class="form-control form-control-sm" onchange="getSeriesName()"  name="version" >                       
 
 
                       </select>
                     </div>
                     <div class="form-group">
                       <label for="exampleFormControlSelect3">Model</label>
-                      <select class="form-control form-control-sm" name="Model">
-                        <option value="INVERNA">Inverna</option>
-                        <option value="KRYSTALINE">Krystaline</option>
-                        <option value="DIAMOND">Diamond</option>
-                      </select>
+                      <select id ="Series" class="form-control form-control-sm" name="Series" >
                     </div>                    
                     <input type="submit" class="btn btn-primary mr-2" value="Submit">
                   </form>
@@ -261,6 +257,34 @@
 }
 
 
+function getSeriesName(){
+
+  var version = $("#version").val();
+  var argument = $("#UnitType").val();
+  $.ajax({
+   type: 'GET',
+   url:  'controller/seriesSelector.php/?Data='+version+","+argument,
+   data: { }
+ })
+  .done( function (SeriesName) {
+
+      //var data  = JSON.stringify(version);
+
+      var ver  = SeriesName.split(",");
+      $("#Series").empty();
+      for (var i = 0; i < ver.length; i++) {
+        $("#Series").append("<option value =\""+ver[i]+"\">"+ver[i]+"</option>");
+      }
+    })   
+  .fail( function (jqXHR, status, error) {
+            // Triggered if response status code is NOT 200 (OK)
+            alert("Fail;")
+          })
+  .always( function() {
+            // Always run after .done() or .fail()
+            $('p:first').after('<p>Thank you.</p>');
+          });
+}
 
 function getUploadGUI(argument) {
 
